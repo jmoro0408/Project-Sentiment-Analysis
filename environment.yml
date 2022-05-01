@@ -1,0 +1,7 @@
+name: project_sentiment
+dependencies:
+  - python=3.9.10
+  - numpy
+  - pandas
+  - requests
+  - pyodbc
