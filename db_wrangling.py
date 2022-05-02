@@ -1,3 +1,7 @@
+"""
+Main module for database functions, including connection querying, inserting etc.
+"""
+
 from configparser import ConfigParser
 from mimetypes import init
 from typing import Optional
@@ -17,17 +21,17 @@ def read_config(filename: str = "database.ini", section: str = "postgresql") -> 
     parser.read(filename)
 
     # get section, default to postgresql
-    db = {}
+    _db = {}
     if parser.has_section(section):
         params = parser.items(section)
         for param in params:
-            db[param[0]] = param[1]
+            _db[param[0]] = param[1]
     else:
         raise Exception(
             "Section {0} not found in the {1} file".format(section, filename)
         )
 
-    return db
+    return _db
 
 
 def connect(params: dict) -> psycopg2.extensions.connection:
@@ -37,15 +41,16 @@ def connect(params: dict) -> psycopg2.extensions.connection:
     be handled by subsequent db tools (query, insert, create etc) or by calling the close
     method of the DataBase class.
     """
-    conn = None
+    _conn = None
     try:
         # read connection parameters
         params = read_config()
         # connect to the PostgreSQL server
-        conn = psycopg2.connect(**params)
-        return conn
+        _conn = psycopg2.connect(**params)
+        return _conn
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL", error)
+        return error
 
 
 class DataBase:
@@ -89,9 +94,9 @@ class DataBase:
 
 
 if __name__ == "__main__":
-    query = """SELECT * from news_source"""
+    QUERY = """SELECT * from news_source"""
     connection_params = read_config()
 
     conn = connect(connection_params)
     db = DataBase(conn=conn)
-    db.query(query=query)
+    db.query(query=QUERY)
