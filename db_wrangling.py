@@ -58,10 +58,10 @@ class DataBase:
     Main database class that handles all querying, inserting, etc
     """
 
-    def __init__(self, conn: psycopg2.extensions.connection) -> None:
+    def __init__(self, _conn: psycopg2.extensions.connection) -> None:
         self.init = init
-        self.conn = conn
-        self.cursor = conn.cursor()
+        self._conn = _conn
+        self.cursor = _conn.cursor()
 
     def query(self, query: Optional[str] = None) -> None:
         """
@@ -98,5 +98,5 @@ if __name__ == "__main__":
     connection_params = read_config()
 
     conn = connect(connection_params)
-    db = DataBase(conn=conn)
+    db = DataBase(_conn=conn)
     db.query(query=QUERY)
