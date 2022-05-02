@@ -1,8 +1,8 @@
 from configparser import ConfigParser
 from typing import Optional
 
-import psycopg2
-from psycopg2 import Error
+import psycopg2 # type: ignore
+from psycopg2 import Error #type: ignore
 
 
 def config(filename: str = "database.ini", section: str = "postgresql") -> dict:
