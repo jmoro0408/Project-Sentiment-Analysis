@@ -4,5 +4,4 @@ dependencies:
   - numpy
   - pandas
   - requests
-  - pyodbc
-  - jupyterlab
+  - psycopg2
