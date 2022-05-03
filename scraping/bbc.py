@@ -2,6 +2,9 @@
 Module to scrap bbc news articles.
 Module will provide article title, text, date, and url
 """
+# TO DO add func to get all bbc articles from search
+# run through all articles from search func and get title/body
+# add capability to get datetime of article
 
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
