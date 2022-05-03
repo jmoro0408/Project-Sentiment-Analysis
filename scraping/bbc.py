@@ -6,12 +6,13 @@ Module will provide article title, text, date, and url
 # run through all articles from search func and get title/body
 # add capability to get datetime of article
 
+from typing import Iterable, List
+
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
-from typing import List, Optional, Iterable
 
 
-def get_bbc_search_urls(search_term: str, pages: Optional[Iterable[int]] = [1]) -> List:
+def get_bbc_search_urls(search_term: str, pages: Iterable = [1]) -> List:
     """
     constructs the bbs search urls for a given search term.
     pages is an iterable that represents the page range to get.
