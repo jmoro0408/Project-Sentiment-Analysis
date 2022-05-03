@@ -8,12 +8,29 @@ Module will provide article title, text, date, and url
 
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
+from typing import List, Optional, Iterable
+
+
+def get_bbc_search_urls(search_term: str, pages: Optional[Iterable[int]] = [1]) -> List:
+    """
+    constructs the bbs search urls for a given search term.
+    pages is an iterable that represents the page range to get.
+    i.e pages = ranges(1,4) will return the first 3 search pages.
+    """
+    search_url = f"https://www.bbc.co.uk/search?q={search_term}&page="
+    urls = []
+    for page in pages:
+        page = str(page)
+        search_with_page = search_url + page
+        urls.append(search_with_page)
+    return urls
 
 
 class BBC:
     """
     main scraping class for BBC articles
     """
+
     def __init__(self, url: str):
         article = requests.get(url)
         self.soup = bs(article.content, "html.parser")
@@ -42,4 +59,5 @@ if __name__ == "__main__":
     parsed = BBC(URL)
     article_body = parsed.body
     article_title = parsed.title
-    print(article_title)
+    pages = range(1, 3)
+    print(get_bbc_search_urls("crossrail", pages))
