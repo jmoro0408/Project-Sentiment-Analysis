@@ -39,4 +39,4 @@ if __name__ == "__main__":
     parsed = BBC(URL)
     article_body = parsed.body
     article_title = parsed.title
-    print(article_body)
+    print(article_title)
