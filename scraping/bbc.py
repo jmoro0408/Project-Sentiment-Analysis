@@ -9,7 +9,7 @@ get the actual article urls we are interested in.
 
 Module will provide article title, text, date, and url
 """
-# TO DO  add capability to get datetime of article
+# TODO  add capability to get datetime of article
 
 from pathlib import Path
 from typing import Iterable, List, Union
@@ -27,7 +27,7 @@ class PageOutOfRangeError(Exception):
 
 def get_bbc_search_pages(search_term: str, pages: Iterable = [1]) -> List:
     """
-    constructs the bbs search urls for a given search term.
+    constructs the bbc search urls for a given search term.
     pages is an iterable that represents the page range to get.
     i.e pages = ranges(1,4) will return the first 3 search pages.
     """
@@ -75,9 +75,13 @@ class BBCArticle:
         """
         get the main article text from the article body
         """
-        body_class = "ssrcss-pv1rh6-ArticleWrapper e1nh2i2l6"
-        table = self.soup.findAll("article", attrs={"class": body_class})
-        text = " ".join([p.text for p in table])
+        text_blocks = self.soup.findAll("div", attrs={"data-component": "text-block"})
+        text = []
+        for item in text_blocks:
+            for p in item.p:
+                if p.name is None:
+                    text.append(p)
+        text = " ".join(text)
         return text
 
     def get_title(self) -> Union[float, str]:
@@ -89,6 +93,17 @@ class BBCArticle:
             return self.soup.find(class_=title_class).text
         except AttributeError:
             return float("nan") #Return nan so that it can be dropped by df.dropna()
+
+    def clean_article(self) -> str:
+        """
+        Cleans the text retrieved from the article body.
+        """
+        string_to_remove = "Follow BBC London on  ,  and  . Send your story ideas to "
+        if string_to_remove in self.body:
+            cleaned_text = self.body.replace(string_to_remove, " ")
+            return cleaned_text.strip()
+        else:
+            return self.body.strip()
 
 
 def bbc_article_pipeline(search_term: str, pages: Iterable = [1]) -> pd.DataFrame:
@@ -106,7 +121,8 @@ def bbc_article_pipeline(search_term: str, pages: Iterable = [1]) -> pd.DataFram
     for article_url in article_urls:
         bbc_article = BBCArticle(url=article_url)
         titles.append(bbc_article.title)
-        bodies.append(bbc_article.body)
+        cleaned_text = bbc_article.clean_article()
+        bodies.append(cleaned_text)
     results = pd.DataFrame(
         list(zip(titles, bodies, article_urls)), columns=["Title", "Body", "URL"]
     ).dropna()
@@ -121,5 +137,5 @@ def save_results_csv(results_df: pd.DataFrame, fname: str):
 
 if __name__ == "__main__":
     search_term = "crossrail"
-    results = bbc_article_pipeline(search_term=search_term, pages=range(1, 4))
-    save_results_csv(results, fname=f"{search_term}_bbc")
+    results = bbc_article_pipeline(search_term=search_term, pages = [1])
+    save_results_csv(results, fname = f"{search_term}_bbc")
