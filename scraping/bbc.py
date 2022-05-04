@@ -11,16 +11,17 @@ Module will provide article title, text, date, and url
 """
 # TO DO  add capability to get datetime of article
 
+from pathlib import Path
 from typing import Iterable, List, Union
 
-import pandas as pd # type: ignore
+import pandas as pd  # type: ignore
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
-from pathlib import Path
 
 
 class PageOutOfRangeError(Exception):
     """Raised when the the provided search range is out of range"""
+
     pass
 
 
@@ -79,7 +80,7 @@ class BBCArticle:
         text = " ".join([p.text for p in table])
         return text
 
-    def get_title(self) -> Union[AttributeError, str]:
+    def get_title(self) -> Union[float, str]:
         """
         get the article title
         """
@@ -88,7 +89,6 @@ class BBCArticle:
             return self.soup.find(class_=title_class).text
         except AttributeError:
             return float("nan")
-
 
 
 def bbc_article_pipeline(search_term: str, pages: Iterable = [1]) -> pd.DataFrame:
@@ -113,6 +113,7 @@ def bbc_article_pipeline(search_term: str, pages: Iterable = [1]) -> pd.DataFram
     results = results.reset_index(drop=True)
     return results
 
+
 def save_results_csv(results_df: pd.DataFrame, fname: str):
     save_dir = Path(Path(Path.cwd(), "scraping/results"), fname + ".csv")
     results_df.to_csv(save_dir)
@@ -120,5 +121,5 @@ def save_results_csv(results_df: pd.DataFrame, fname: str):
 
 if __name__ == "__main__":
     search_term = "crossrail"
-    results = bbc_article_pipeline(search_term=search_term, pages=range(1,4))
-    save_results_csv(results, fname = f"{search_term}_bbc")
+    results = bbc_article_pipeline(search_term=search_term, pages=range(1, 4))
+    save_results_csv(results, fname=f"{search_term}_bbc")
