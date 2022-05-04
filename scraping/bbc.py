@@ -14,15 +14,17 @@ Module will provide article title, text, date, and url
 # add capability to get datetime of article
 
 from re import A
-from typing import Iterable, List
+from typing import Iterable, List, Union
 
+import pandas as pd # type: ignore
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
-import pandas as pd
+
 
 class PageOutOfRangeError(Exception):
     """Raised when the the provided search range is out of range"""
     pass
+
 
 def get_bbc_search_pages(search_term: str, pages: Iterable = [1]) -> List:
     """
@@ -69,7 +71,6 @@ class BBCArticle:
         self.soup = bs(article.content, "html.parser")
         self.body = self.get_body()
         self.title = self.get_title()
-        self.result = {}
 
     def get_body(self) -> str:
         """
@@ -80,17 +81,18 @@ class BBCArticle:
         text = " ".join([p.text for p in table])
         return text
 
-    def get_title(self) -> str:
+    def get_title(self) -> Union[AttributeError, str]:
         """
         get the article title
         """
         title_class = "ssrcss-15xko80-StyledHeading e1fj1fc10"
         try:
             return self.soup.find(class_=title_class).text
-        except AttributeError:
-            pass
+        except AttributeError as err:
+            return err
 
-def bbc_article_pipeline(search_term:str, pages:Iterable = [1]) -> pd.DataFrame:
+
+def bbc_article_pipeline(search_term: str, pages: Iterable = [1]) -> pd.DataFrame:
     """
     Run through the bbc news article pipeline.
     1. gets the search page results from the search term and num of pages
@@ -98,19 +100,20 @@ def bbc_article_pipeline(search_term:str, pages:Iterable = [1]) -> pd.DataFrame:
     3. for each article, gets the title and text body
     4. returns a dataframe of title, text body, and url
     """
-    search_results_pages = get_bbc_search_pages(search_term=search_term, pages = pages)
+    search_results_pages = get_bbc_search_pages(search_term=search_term, pages=pages)
     article_urls = get_article_urls_from_search(search_results_pages)
     titles = []
     bodies = []
     for article_url in article_urls:
-        bbc_article = BBCArticle(url = article_url)
+        bbc_article = BBCArticle(url=article_url)
         titles.append(bbc_article.title)
         bodies.append(bbc_article.body)
-    results = pd.DataFrame(list(zip(titles, bodies, article_urls)),columns =['Title', 'Body', 'URL']).dropna()
-    results = results.reset_index(drop = True )
+    results = pd.DataFrame(
+        list(zip(titles, bodies, article_urls)), columns=["Title", "Body", "URL"]
+    ).dropna()
+    results = results.reset_index(drop=True)
     return results
 
 
 if __name__ == "__main__":
-    results = bbc_article_pipeline(search_term = "crossrail", pages = [1])
-    testvar = 1
+    results = bbc_article_pipeline(search_term="crossrail", pages=[1])
