@@ -19,6 +19,7 @@ from typing import Iterable, List, Union
 import pandas as pd # type: ignore
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
+from pathlib import Path
 
 
 class PageOutOfRangeError(Exception):
@@ -51,10 +52,10 @@ def get_article_urls_from_search(search_results_urls: List) -> List:
     Returns a list of all the article urls.
     """
     substring = "bbc.co.uk/news/uk"
+    links = []
     for search_url in search_results_urls:
         search_results_content = requests.get(search_url).content
         soup = bs(search_results_content, "html.parser")
-        links = []
         for link in soup.find_all("a"):
             links.append(link.get("href"))
         links_with_substring = [string for string in links if substring in string]
@@ -92,6 +93,7 @@ class BBCArticle:
             return err
 
 
+
 def bbc_article_pipeline(search_term: str, pages: Iterable = [1]) -> pd.DataFrame:
     """
     Run through the bbc news article pipeline.
@@ -114,6 +116,12 @@ def bbc_article_pipeline(search_term: str, pages: Iterable = [1]) -> pd.DataFram
     results = results.reset_index(drop=True)
     return results
 
+def save_results_csv(results_df: pd.DataFrame, fname: str):
+    save_dir = Path(Path(Path.cwd(), "scraping/results"), fname + ".csv")
+    results_df.to_csv(save_dir)
+
 
 if __name__ == "__main__":
-    results = bbc_article_pipeline(search_term="crossrail", pages=[1])
+    search_term = "crossrail"
+    results = bbc_article_pipeline(search_term=search_term, pages=range(1,10))
+    save_results_csv(results, fname = f"{search_term}_bbc")
