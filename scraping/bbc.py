@@ -9,11 +9,8 @@ get the actual article urls we are interested in.
 
 Module will provide article title, text, date, and url
 """
-# TO DO add func to get all bbc articles from search
-# run through all articles from search func and get title/body
-# add capability to get datetime of article
+# TO DO  add capability to get datetime of article
 
-from re import A
 from typing import Iterable, List, Union
 
 import pandas as pd # type: ignore
@@ -89,8 +86,8 @@ class BBCArticle:
         title_class = "ssrcss-15xko80-StyledHeading e1fj1fc10"
         try:
             return self.soup.find(class_=title_class).text
-        except AttributeError as err:
-            return err
+        except AttributeError:
+            return float("nan")
 
 
 
@@ -123,5 +120,5 @@ def save_results_csv(results_df: pd.DataFrame, fname: str):
 
 if __name__ == "__main__":
     search_term = "crossrail"
-    results = bbc_article_pipeline(search_term=search_term, pages=range(1,10))
+    results = bbc_article_pipeline(search_term=search_term, pages=range(1,4))
     save_results_csv(results, fname = f"{search_term}_bbc")
