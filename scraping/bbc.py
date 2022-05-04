@@ -88,7 +88,7 @@ class BBCArticle:
         try:
             return self.soup.find(class_=title_class).text
         except AttributeError:
-            return float("nan")
+            return float("nan") #Return nan so that it can be dropped by df.dropna()
 
 
 def bbc_article_pipeline(search_term: str, pages: Iterable = [1]) -> pd.DataFrame:
