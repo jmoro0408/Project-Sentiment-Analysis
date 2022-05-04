@@ -5,3 +5,4 @@ dependencies:
   - pandas
   - requests
   - psycopg2
+  - beautifulsoup4
