@@ -98,12 +98,13 @@ class BBCArticle:
         """
         Cleans the text retrieved from the article body.
         """
-        string_to_remove = "Follow BBC London on  ,  and  . Send your story ideas to "
-        if string_to_remove in self.body:
-            cleaned_text = self.body.replace(string_to_remove, " ")
-            return cleaned_text.strip()
-        else:
-            return self.body.strip()
+        string_to_removes = ["Follow BBC London on  ,  and  . Send your story ideas to ",]
+        for string_to_remove in string_to_removes:
+            if string_to_remove in self.body:
+                cleaned_text = self.body.replace(string_to_remove, " ")
+                return cleaned_text.strip()
+            else:
+                return self.body.strip()
 
 
 def bbc_article_pipeline(search_term: str, pages: Iterable = [1]) -> pd.DataFrame:
