@@ -91,6 +91,13 @@ class BBCArticle:
             pass
 
 def bbc_article_pipeline(search_term:str, pages:Iterable = [1]) -> pd.DataFrame:
+    """
+    Run through the bbc news article pipeline.
+    1. gets the search page results from the search term and num of pages
+    2. gets the individual article urls from the search page
+    3. for each article, gets the title and text body
+    4. returns a dataframe of title, text body, and url
+    """
     search_results_pages = get_bbc_search_pages(search_term=search_term, pages = pages)
     article_urls = get_article_urls_from_search(search_results_pages)
     titles = []
@@ -99,7 +106,7 @@ def bbc_article_pipeline(search_term:str, pages:Iterable = [1]) -> pd.DataFrame:
         bbc_article = BBCArticle(url = article_url)
         titles.append(bbc_article.title)
         bodies.append(bbc_article.body)
-    results = pd.DataFrame(list(zip(titles, bodies)),columns =['Title', 'Body']).dropna()
+    results = pd.DataFrame(list(zip(titles, bodies, article_urls)),columns =['Title', 'Body', 'URL']).dropna()
     results = results.reset_index(drop = True )
     return results
 
