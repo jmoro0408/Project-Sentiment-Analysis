@@ -67,9 +67,9 @@ class BBCArticle:
     def __init__(self, url: str):
         article = requests.get(url)
         self.soup = bs(article.content, "html.parser")
-        self.body = self.get_body()
-        self.title = self.get_title()
-        self.date = self.get_date()
+        self.body = self.get_body() # I dont think these should be class attributes.
+        self.title = self.get_title() #move them out
+        self.date = self.get_date() # to instance attributes, like guardian.py
 
     def get_body(self) -> str:
         """
