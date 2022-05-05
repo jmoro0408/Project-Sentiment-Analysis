@@ -3,15 +3,19 @@ Module docstring to keep pylint happy
 """
 
 import os
+from typing import Dict
 
 import requests
 from dotenv import load_dotenv
 
+load_dotenv()
+API_KEY = str(os.getenv("GUARDIAN_API_KEY"))
 
 class GuardianAPI:
     """
     class to handle the querying of the guardian api
     """
+    results: Dict
 
     def __init__(self, search_term: str, api_key: str):
         self.search_term = search_term
@@ -29,10 +33,10 @@ class GuardianAPI:
         get response from guardian api
         """
         _query = self.build_api_query()
-        response = requests.get(
+        api_response = requests.get(
             _query
         )  # should add some exception handling for invalid status codes
-        return response
+        return api_response
 
     def parse_api_response(self, result_number: int) -> dict:
         """
@@ -63,13 +67,11 @@ class GuardianArticle:
     pass
 
 
-def guardian_api_pipeline(search_term: str, api_key: str, result_num: int):
+def main(search_term: str, api_key: str, result_num: int):
     guardian_api = GuardianAPI("crossrail", api_key)
     guardian_api.results = guardian_api.parse_api_response(result_num)
     print(guardian_api.results)
 
 
 if __name__ == "__main__":
-    load_dotenv()
-    API_KEY = str(os.getenv("GUARDIAN_API_KEY"))
-    guardian_api_pipeline("crossrail", API_KEY, result_num = 0)
+    main(search_term = "crossrail", api_key = API_KEY, result_num=0)
