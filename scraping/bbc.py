@@ -10,9 +10,9 @@ get the actual article urls we are interested in.
 Module will provide article title, text, date, and url
 """
 
-from pathlib import Path
-from typing import Iterable, List, Union
 import datetime
+from pathlib import Path
+from typing import Iterable, List, Optional, Union
 
 import pandas as pd  # type: ignore
 import requests  # type: ignore
@@ -77,12 +77,12 @@ class BBCArticle:
         get the main article text from the article body
         """
         text_blocks = self.soup.findAll("div", attrs={"data-component": "text-block"})
-        text = []
+        text_list = []
         for item in text_blocks:
             for p in item.p:
                 if p.name is None:
-                    text.append(p)
-        text = " ".join(text)
+                    text_list.append(p)
+        text = " ".join(text_list)
         return text
 
     def get_title(self) -> Union[float, str]:
@@ -93,25 +93,28 @@ class BBCArticle:
         try:
             return self.soup.find(class_=title_class).text
         except AttributeError:
-            return float("nan") #Return nan so that it can be dropped by df.dropna()
+            return float("nan")  # Return nan so that it can be dropped by df.dropna()
 
-    def clean_article(self) -> str:
+    def clean_article(self) -> Optional[str]:
         """
         Cleans the text retrieved from the article body.
         """
-        string_to_removes = ["Follow BBC London on  ,  and  . Send your story ideas to ",]
+        string_to_removes = [
+            "Follow BBC London on  ,  and  . Send your story ideas to ",
+        ]
         for string_to_remove in string_to_removes:
             if string_to_remove in self.body:
                 cleaned_text = self.body.replace(string_to_remove, " ")
                 return cleaned_text.strip()
             else:
                 return self.body.strip()
+        return None
 
-    def get_date(self):
+    def get_date(self) -> datetime.date:
         """
         returns the date of the published article in datetime format
         """
-        datetime_string = self.soup.time.attrs['datetime']
+        datetime_string = self.soup.time.attrs["datetime"]
         date_string = datetime_string.split("T")[0]
         return datetime.date.fromisoformat(date_string)
 
@@ -136,7 +139,8 @@ def bbc_article_pipeline(search_term: str, pages: Iterable = [1]) -> pd.DataFram
         dates.append(bbc_article.date)
 
     results = pd.DataFrame(
-        list(zip(titles, bodies, article_urls, dates)), columns=["Title", "Body", "URL", "Date"]
+        list(zip(titles, bodies, article_urls, dates)),
+        columns=["Title", "Body", "URL", "Date"],
     ).dropna()
     results = results.reset_index(drop=True)
     return results
@@ -149,6 +153,6 @@ def save_results_csv(results_df: pd.DataFrame, fname: str):
 
 if __name__ == "__main__":
     SEARCH_TERM = "crossrail"
-    SEARCH_PAGES = range(1,10)
-    results = bbc_article_pipeline(search_term=SEARCH_TERM, pages = SEARCH_PAGES)
-    save_results_csv(results, fname = f"{SEARCH_TERM}_bbc")
+    SEARCH_PAGES = [1]
+    results = bbc_article_pipeline(search_term=SEARCH_TERM, pages=SEARCH_PAGES)
+    save_results_csv(results, fname=f"{SEARCH_TERM}_bbc")
