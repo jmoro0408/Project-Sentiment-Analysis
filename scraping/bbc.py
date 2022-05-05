@@ -21,11 +21,10 @@ from bs4 import BeautifulSoup as bs  # type: ignore
 
 class PageOutOfRangeError(Exception):
     """Raised when the the provided search range is out of range"""
-
     pass
 
 
-def get_bbc_search_pages(search_term: str, pages: Iterable = [1]) -> List:
+def get_bbc_search_pages(search_term: str, pages: Iterable) -> List:
     """
     constructs the bbc search urls for a given search term.
     pages is an iterable that represents the page range to get.
@@ -119,7 +118,7 @@ class BBCArticle:
         return datetime.date.fromisoformat(date_string)
 
 
-def bbc_article_pipeline(search_term: str, pages: Iterable = [1]) -> pd.DataFrame:
+def bbc_article_pipeline(search_term: str, pages: Iterable) -> pd.DataFrame:
     """
     Run through the bbc news article pipeline.
     1. gets the search page results from the search term and num of pages
@@ -138,12 +137,12 @@ def bbc_article_pipeline(search_term: str, pages: Iterable = [1]) -> pd.DataFram
         bodies.append(bbc_article.clean_article())
         dates.append(bbc_article.date)
 
-    results = pd.DataFrame(
+    _results = pd.DataFrame(
         list(zip(titles, bodies, article_urls, dates)),
         columns=["Title", "Body", "URL", "Date"],
     ).dropna()
-    results = results.reset_index(drop=True)
-    return results
+    _results = _results.reset_index(drop=True)
+    return _results
 
 
 def save_results_csv(results_df: pd.DataFrame, fname: str):
@@ -152,7 +151,9 @@ def save_results_csv(results_df: pd.DataFrame, fname: str):
 
 
 if __name__ == "__main__":
+    SAVE = False
     SEARCH_TERM = "HS2"
-    SEARCH_PAGES = range(1,10)
+    SEARCH_PAGES = [1]
     results = bbc_article_pipeline(search_term=SEARCH_TERM, pages=SEARCH_PAGES)
-    save_results_csv(results, fname=f"{SEARCH_TERM}_bbc")
+    if SAVE:
+        save_results_csv(results, fname=f"{SEARCH_TERM}_bbc")
