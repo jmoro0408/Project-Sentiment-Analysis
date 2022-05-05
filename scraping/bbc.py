@@ -9,7 +9,6 @@ get the actual article urls we are interested in.
 
 Module will provide article title, text, date, and url
 """
-# TODO Move body/title/date from class attribute to instance attribute
 
 import datetime
 from pathlib import Path
@@ -19,9 +18,14 @@ import pandas as pd  # type: ignore
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
 
+SAVE = False
+SEARCH_TERM = "HS2"
+SEARCH_PAGES = [1]
+
 
 class PageOutOfRangeError(Exception):
     """Raised when the the provided search range is out of range"""
+
     pass
 
 
@@ -65,12 +69,13 @@ class BBCArticle:
     main scraping class for BBC articles
     """
 
+    body: str
+    title: str
+    date: datetime.date
+
     def __init__(self, url: str):
         article = requests.get(url)
         self.soup = bs(article.content, "html.parser")
-        self.body = self.get_body() # I dont think these should be class attributes.
-        self.title = self.get_title() #move them out
-        self.date = self.get_date() # to instance attributes, like guardian.py
 
     def get_body(self) -> str:
         """
@@ -85,13 +90,13 @@ class BBCArticle:
         text = " ".join(text_list)
         return text
 
-    def get_title(self) -> Union[float, str]:
+    def get_title(self) -> Union[str, float]:
         """
         get the article title
         """
         title_class = "ssrcss-15xko80-StyledHeading e1fj1fc10"
         try:
-            return self.soup.find(class_=title_class).text
+            return str(self.soup.find(class_=title_class).text)
         except AttributeError:
             return float("nan")  # Return nan so that it can be dropped by df.dropna()
 
@@ -119,7 +124,7 @@ class BBCArticle:
         return datetime.date.fromisoformat(date_string)
 
 
-def bbc_article_pipeline(search_term: str, pages: Iterable) -> pd.DataFrame:
+def main(search_term: str, pages: Iterable) -> pd.DataFrame:
     """
     Run through the bbc news article pipeline.
     1. gets the search page results from the search term and num of pages
@@ -134,16 +139,22 @@ def bbc_article_pipeline(search_term: str, pages: Iterable) -> pd.DataFrame:
     dates = []
     for article_url in article_urls:
         bbc_article = BBCArticle(url=article_url)
+        bbc_article.title = str(
+            bbc_article.get_title()
+        )  # mypy complains if not wrapped in str()
+        bbc_article.body = bbc_article.get_body()
+        bbc_article.date = bbc_article.get_date()
         titles.append(bbc_article.title)
         bodies.append(bbc_article.clean_article())
         dates.append(bbc_article.date)
 
-    _results = pd.DataFrame(
+    results_df = pd.DataFrame(
         list(zip(titles, bodies, article_urls, dates)),
         columns=["Title", "Body", "URL", "Date"],
     ).dropna()
-    _results = _results.reset_index(drop=True)
-    return _results
+    results_df = results_df.reset_index(drop=True)
+    print(results_df.head())
+    return results_df
 
 
 def save_results_csv(results_df: pd.DataFrame, fname: str):
@@ -152,9 +163,6 @@ def save_results_csv(results_df: pd.DataFrame, fname: str):
 
 
 if __name__ == "__main__":
-    SAVE = False
-    SEARCH_TERM = "HS2"
-    SEARCH_PAGES = [1]
-    results = bbc_article_pipeline(search_term=SEARCH_TERM, pages=SEARCH_PAGES)
+    results = main(search_term=SEARCH_TERM, pages=SEARCH_PAGES)
     if SAVE:
         save_results_csv(results, fname=f"{SEARCH_TERM}_bbc")
