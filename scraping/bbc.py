@@ -9,6 +9,7 @@ get the actual article urls we are interested in.
 
 Module will provide article title, text, date, and url
 """
+# TODO Move body/title/date from class attribute to instance attribute
 
 import datetime
 from pathlib import Path
