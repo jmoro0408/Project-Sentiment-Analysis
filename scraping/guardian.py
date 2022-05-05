@@ -8,13 +8,14 @@ import requests
 from dotenv import load_dotenv
 
 
-class GuardianAPI():
+class GuardianAPI:
     """
     class to handle the querying of the guardian api
     """
+
     def __init__(self, search_term: str, api_key: str):
-            self.search_term = search_term
-            self.api_key = api_key
+        self.search_term = search_term
+        self.api_key = api_key
 
     def build_api_query(self) -> str:
         """
@@ -28,7 +29,9 @@ class GuardianAPI():
         get response from guardian api
         """
         _query = self.build_api_query()
-        response = requests.get(_query) #should add some exception handling for invalid status codes
+        response = requests.get(
+            _query
+        )  # should add some exception handling for invalid status codes
         return response
 
     def parse_api_response(self, result_number: int) -> dict:
@@ -41,10 +44,14 @@ class GuardianAPI():
         """
         _response = self.get_api_response()
         results_list = _response.json()["response"]["results"]
-        article_results = [result for result in results_list if result["type"]== "article"]
-        result_dict = {"webTitle": article_results[result_number]["webTitle"],
-                         "webUrl": article_results[result_number]["webUrl"],
-                         "webPublicationDate": article_results[result_number]["webPublicationDate"]}
+        article_results = [
+            result for result in results_list if result["type"] == "article"
+        ]
+        result_dict = {
+            "webTitle": article_results[result_number]["webTitle"],
+            "webUrl": article_results[result_number]["webUrl"],
+            "webPublicationDate": article_results[result_number]["webPublicationDate"],
+        }
         return result_dict
 
 
@@ -52,13 +59,14 @@ class GuardianArticle:
     """
     class to handle the parsing of individial guardian articles
     """
+
     pass
 
-def guardian_api_pipeline(search_term:str, api_key:str):
-    guardian_api = GuardianAPI("crossrail", API_KEY)
-    results = (guardian_api.parse_api_response(0))
-    print(results)
 
+def guardian_api_pipeline(search_term: str, api_key: str):
+    guardian_api = GuardianAPI("crossrail", API_KEY)
+    results = guardian_api.parse_api_response(0)
+    print(results)
 
 
 if __name__ == "__main__":
