@@ -37,4 +37,4 @@ if __name__ == "__main__":
     load_dotenv()
     API_KEY = str(os.getenv("GUARDIAN_API_KEY"))
     guardian = GuardianArticle("crossrail", API_KEY)
-    print(guardian.response.text)
+    print(type(guardian.response.text))

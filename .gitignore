@@ -3,6 +3,7 @@ database.ini
 test.py
 test.ipynb
 .env
+/scraping/results
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
