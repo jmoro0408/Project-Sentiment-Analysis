@@ -63,13 +63,13 @@ class GuardianArticle:
     pass
 
 
-def guardian_api_pipeline(search_term: str, api_key: str):
-    guardian_api = GuardianAPI("crossrail", API_KEY)
-    results = guardian_api.parse_api_response(0)
-    print(results)
+def guardian_api_pipeline(search_term: str, api_key: str, result_num: int):
+    guardian_api = GuardianAPI("crossrail", api_key)
+    guardian_api.results = guardian_api.parse_api_response(result_num)
+    print(guardian_api.results)
 
 
 if __name__ == "__main__":
     load_dotenv()
     API_KEY = str(os.getenv("GUARDIAN_API_KEY"))
-    guardian_api_pipeline("crossrail", API_KEY)
+    guardian_api_pipeline("crossrail", API_KEY, result_num = 0)
