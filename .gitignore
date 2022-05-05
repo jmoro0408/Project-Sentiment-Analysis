@@ -2,6 +2,7 @@
 database.ini
 test.py
 test.ipynb
+.env
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
