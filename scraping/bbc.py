@@ -9,7 +9,6 @@ get the actual article urls we are interested in.
 
 Module will provide article title, text, date, and url
 """
-# TODO  add capability to get datetime of article
 
 from pathlib import Path
 from typing import Iterable, List, Union
@@ -71,6 +70,7 @@ class BBCArticle:
         self.soup = bs(article.content, "html.parser")
         self.body = self.get_body()
         self.title = self.get_title()
+        self.date = self.get_date()
 
     def get_body(self) -> str:
         """
@@ -116,7 +116,6 @@ class BBCArticle:
         return datetime.date.fromisoformat(date_string)
 
 
-
 def bbc_article_pipeline(search_term: str, pages: Iterable = [1]) -> pd.DataFrame:
     """
     Run through the bbc news article pipeline.
@@ -129,13 +128,15 @@ def bbc_article_pipeline(search_term: str, pages: Iterable = [1]) -> pd.DataFram
     article_urls = get_article_urls_from_search(search_results_pages)
     titles = []
     bodies = []
+    dates = []
     for article_url in article_urls:
         bbc_article = BBCArticle(url=article_url)
         titles.append(bbc_article.title)
-        cleaned_text = bbc_article.clean_article()
-        bodies.append(cleaned_text)
+        bodies.append(bbc_article.clean_article())
+        dates.append(bbc_article.date)
+
     results = pd.DataFrame(
-        list(zip(titles, bodies, article_urls)), columns=["Title", "Body", "URL"]
+        list(zip(titles, bodies, article_urls, dates)), columns=["Title", "Body", "URL", "Date"]
     ).dropna()
     results = results.reset_index(drop=True)
     return results
@@ -147,6 +148,7 @@ def save_results_csv(results_df: pd.DataFrame, fname: str):
 
 
 if __name__ == "__main__":
-    search_term = "crossrail"
-    results = bbc_article_pipeline(search_term=search_term, pages = [1])
-    save_results_csv(results, fname = f"{search_term}_bbc")
+    SEARCH_TERM = "crossrail"
+    SEARCH_PAGES = range(1,10)
+    results = bbc_article_pipeline(search_term=SEARCH_TERM, pages = SEARCH_PAGES)
+    save_results_csv(results, fname = f"{SEARCH_TERM}_bbc")
