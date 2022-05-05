@@ -13,6 +13,7 @@ Module will provide article title, text, date, and url
 
 from pathlib import Path
 from typing import Iterable, List, Union
+import datetime
 
 import pandas as pd  # type: ignore
 import requests  # type: ignore
@@ -105,6 +106,15 @@ class BBCArticle:
                 return cleaned_text.strip()
             else:
                 return self.body.strip()
+
+    def get_date(self):
+        """
+        returns the date of the published article in datetime format
+        """
+        datetime_string = self.soup.time.attrs['datetime']
+        date_string = datetime_string.split("T")[0]
+        return datetime.date.fromisoformat(date_string)
+
 
 
 def bbc_article_pipeline(search_term: str, pages: Iterable = [1]) -> pd.DataFrame:
