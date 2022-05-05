@@ -153,6 +153,6 @@ def save_results_csv(results_df: pd.DataFrame, fname: str):
 
 if __name__ == "__main__":
     SEARCH_TERM = "crossrail"
-    SEARCH_PAGES = [1]
+    SEARCH_PAGES = range(1,10)
     results = bbc_article_pipeline(search_term=SEARCH_TERM, pages=SEARCH_PAGES)
     save_results_csv(results, fname=f"{SEARCH_TERM}_bbc")
