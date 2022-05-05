@@ -11,10 +11,12 @@ from dotenv import load_dotenv
 load_dotenv()
 API_KEY = str(os.getenv("GUARDIAN_API_KEY"))
 
+
 class GuardianAPI:
     """
     class to handle the querying of the guardian api
     """
+
     results: Dict
 
     def __init__(self, search_term: str, api_key: str):
@@ -74,4 +76,4 @@ def main(search_term: str, api_key: str, result_num: int):
 
 
 if __name__ == "__main__":
-    main(search_term = "crossrail", api_key = API_KEY, result_num=0)
+    main(search_term="crossrail", api_key=API_KEY, result_num=0)
