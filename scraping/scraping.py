@@ -13,9 +13,10 @@ class Scraper:
     """
     Scraper methods that can be used across multiple news scraping sites
     """
+
     def __init__(self):
-        self.body = None
-        self.article_Date = None
+        self.body: str
+        self.article_date: Union[datetime.date, str]
 
     """named article_date vs date to
     avoid confusion with datetime.date or "from datetime import date"""

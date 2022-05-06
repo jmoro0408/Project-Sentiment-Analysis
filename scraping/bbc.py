@@ -10,6 +10,8 @@ get the actual article urls we are interested in.
 Module will provide article title, text, date, and url
 """
 
+# TODO main() is doing too much. Seperate out the BBCArticle Object construction.
+
 import datetime
 from typing import Iterable, List, Union
 
@@ -73,7 +75,7 @@ class BBCArticle(Scraper):
     def __init__(self, url: str):
         article = requests.get(url)
         self.soup = bs(article.content, "html.parser")
-        self.title = None
+        self.title: Union[str, float]
 
     def get_date(self) -> str:
         """
