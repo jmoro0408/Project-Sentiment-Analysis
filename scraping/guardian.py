@@ -3,13 +3,17 @@ Module docstring to keep pylint happy
 """
 
 import os
+from re import A
 from typing import Dict
 
+from scraping import Scraper
 import requests
 from dotenv import load_dotenv
+from bs4 import BeautifulSoup as bs  # type: ignore
 
 load_dotenv()
 API_KEY = str(os.getenv("GUARDIAN_API_KEY"))
+SEARCH_TERM = "crossrail"
 
 
 class GuardianAPI:
@@ -44,6 +48,9 @@ class GuardianAPI:
         """
         parses the response from the api query. See link for examples:
         https://open-platform.theguardian.com/explore/
+        the response typically returns a ton of web page results. To keep this similar to the bbc
+        article, and generally clean, I'm making this grab only one result at a time, correspoding to the
+        "result_number" argument.
         This method deliberately only parses one result at a time.
         The intention here is that this method is called in a loop, parsing each result as required.
         The argument result_number should be supplied, calling out which specific result is wanted.
@@ -61,19 +68,39 @@ class GuardianAPI:
         return result_dict
 
 
-class GuardianArticle:
+class GuardianArticle(Scraper):
     """
     class to handle the parsing of individial guardian articles
     """
+    body: str
+    def __init__(self, url:str):
+        article = requests.get(url)
+        self.soup = bs(article.content, "html.parser")
 
-    pass
+    def get_body(self) -> str:
+        """
+        get the main article text from the article body
+        """
+        text_blocks = self.soup.findAll("div", attrs={"data-gu-name": "body"})
+        text_list = []
+        for element in text_blocks:
+            text_list.append((element.findAll(text = True)))
+        text = " ".join(text_list[0])
+        return text
 
 
 def main(search_term: str, api_key: str, result_num: int):
+    """
+    """
     guardian_api = GuardianAPI(search_term, api_key)
     guardian_api.results = guardian_api.parse_api_response(result_num)
-    print(guardian_api.results)
+    guardian_article = GuardianArticle(url = guardian_api.results["webUrl"])
+    guardian_article.body = guardian_article.get_body()
+    article_text = guardian_article.clean_article(strings_to_remove=None)
+    return article_text
+
+
 
 
 if __name__ == "__main__":
-    main(search_term="crossrail", api_key=API_KEY, result_num=0)
+    print(main(search_term=SEARCH_TERM, api_key=API_KEY, result_num=0))
