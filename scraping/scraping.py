@@ -28,7 +28,9 @@ class Scraper:
         """
         Cleans the text retrieved from the article body.
         """
-        if strings_to_remove is not None:
+        if strings_to_remove is None:
+            return self.body.strip()
+        else:
             for string_to_remove in strings_to_remove:
                 if string_to_remove in self.body:
                     cleaned_text = self.body.replace(string_to_remove, " ")
