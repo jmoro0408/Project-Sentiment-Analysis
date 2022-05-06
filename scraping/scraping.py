@@ -24,15 +24,15 @@ class Scraper:
         date_string = datetime_string.split("T")[0]
         return datetime.date.fromisoformat(date_string)
 
-    def clean_article(self, strings_to_remove: List) -> Optional[str]:
+    def clean_article(self, strings_to_remove: Optional[List] = None) -> Optional[str]:
         """
         Cleans the text retrieved from the article body.
         """
-
-        for string_to_remove in strings_to_remove:
-            if string_to_remove in self.body:
-                cleaned_text = self.body.replace(string_to_remove, " ")
-                return cleaned_text.strip()
-            else:
-                return self.body.strip()
+        if strings_to_remove is not None:
+            for string_to_remove in strings_to_remove:
+                if string_to_remove in self.body:
+                    cleaned_text = self.body.replace(string_to_remove, " ")
+                    return cleaned_text.strip()
+                else:
+                    return self.body.strip()
         return None
