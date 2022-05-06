@@ -70,7 +70,7 @@ class GuardianArticle:
 
 
 def main(search_term: str, api_key: str, result_num: int):
-    guardian_api = GuardianAPI("crossrail", api_key)
+    guardian_api = GuardianAPI(search_term, api_key)
     guardian_api.results = guardian_api.parse_api_response(result_num)
     print(guardian_api.results)
 

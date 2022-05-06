@@ -18,6 +18,8 @@ import pandas as pd  # type: ignore
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
 
+from scraping import Scraper
+
 SAVE = False
 SEARCH_TERM = "HS2"
 SEARCH_PAGES = [1]
@@ -64,7 +66,7 @@ def get_article_urls_from_search(search_results_urls: List) -> List:
     return links_with_substring
 
 
-class BBCArticle:
+class BBCArticle(Scraper):
     """
     main scraping class for BBC articles
     """
@@ -100,29 +102,6 @@ class BBCArticle:
         except AttributeError:
             return float("nan")  # Return nan so that it can be dropped by df.dropna()
 
-    def clean_article(self) -> Optional[str]:
-        """
-        Cleans the text retrieved from the article body.
-        """
-        string_to_removes = [
-            "Follow BBC London on  ,  and  . Send your story ideas to ",
-        ]
-        for string_to_remove in string_to_removes:
-            if string_to_remove in self.body:
-                cleaned_text = self.body.replace(string_to_remove, " ")
-                return cleaned_text.strip()
-            else:
-                return self.body.strip()
-        return None
-
-    def get_date(self) -> datetime.date:
-        """
-        returns the date of the published article in datetime format
-        """
-        datetime_string = self.soup.time.attrs["datetime"]
-        date_string = datetime_string.split("T")[0]
-        return datetime.date.fromisoformat(date_string)
-
 
 def main(search_term: str, pages: Iterable) -> pd.DataFrame:
     """
@@ -132,6 +111,9 @@ def main(search_term: str, pages: Iterable) -> pd.DataFrame:
     3. for each article, gets the title and text body
     4. returns a dataframe of title, text body, and url
     """
+    article_strings_to_remove = [
+        "Follow BBC London on  ,  and  . Send your story ideas to ",
+    ]
     search_results_pages = get_bbc_search_pages(search_term=search_term, pages=pages)
     article_urls = get_article_urls_from_search(search_results_pages)
     titles = []
@@ -145,7 +127,9 @@ def main(search_term: str, pages: Iterable) -> pd.DataFrame:
         bbc_article.body = bbc_article.get_body()
         bbc_article.date = bbc_article.get_date()
         titles.append(bbc_article.title)
-        bodies.append(bbc_article.clean_article())
+        bodies.append(
+            bbc_article.clean_article(strings_to_remove=article_strings_to_remove)
+        )
         dates.append(bbc_article.date)
 
     results_df = pd.DataFrame(
