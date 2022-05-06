@@ -18,7 +18,7 @@ import pandas as pd  # type: ignore
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
 
-from scraping import Scraper
+from scraping import Scraper, save_results_csv
 
 SAVE = False
 SEARCH_TERM = "HS2"
@@ -79,6 +79,12 @@ class BBCArticle(Scraper):
         article = requests.get(url)
         self.soup = bs(article.content, "html.parser")
 
+    def get_date(self) -> str:
+        """
+        returns the date of the published article in datetime format
+        """
+        return str(self.soup.time.attrs["datetime"])
+
     def get_body(self) -> str:
         """
         get the main article text from the article body
@@ -130,7 +136,8 @@ def main(search_term: str, pages: Iterable) -> pd.DataFrame:
         bodies.append(
             bbc_article.clean_article(strings_to_remove=article_strings_to_remove)
         )
-        dates.append(bbc_article.date)
+
+        dates.append(bbc_article.clean_date())
 
     results_df = pd.DataFrame(
         list(zip(titles, bodies, article_urls, dates)),
@@ -139,11 +146,6 @@ def main(search_term: str, pages: Iterable) -> pd.DataFrame:
     results_df = results_df.reset_index(drop=True)
     print(results_df.head())
     return results_df
-
-
-def save_results_csv(results_df: pd.DataFrame, fname: str):
-    save_dir = Path(Path(Path.cwd(), "scraping/results"), fname + ".csv")
-    results_df.to_csv(save_dir)
 
 
 if __name__ == "__main__":
