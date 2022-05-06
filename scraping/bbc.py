@@ -11,8 +11,7 @@ Module will provide article title, text, date, and url
 """
 
 import datetime
-from pathlib import Path
-from typing import Iterable, List, Optional, Union
+from typing import Iterable, List, Union
 
 import pandas as pd  # type: ignore
 import requests  # type: ignore
@@ -73,7 +72,7 @@ class BBCArticle(Scraper):
 
     body: str
     title: str
-    date: datetime.date
+    article_date: Union[str, datetime.date]
 
     def __init__(self, url: str):
         article = requests.get(url)
@@ -131,20 +130,20 @@ def main(search_term: str, pages: Iterable) -> pd.DataFrame:
             bbc_article.get_title()
         )  # mypy complains if not wrapped in str()
         bbc_article.body = bbc_article.get_body()
-        bbc_article.date = bbc_article.get_date()
+        bbc_article.article_date = bbc_article.get_date()
+        bbc_article.article_date = bbc_article.clean_date()
         titles.append(bbc_article.title)
         bodies.append(
             bbc_article.clean_article(strings_to_remove=article_strings_to_remove)
         )
 
-        dates.append(bbc_article.clean_date())
+        dates.append(bbc_article.article_date)
 
     results_df = pd.DataFrame(
         list(zip(titles, bodies, article_urls, dates)),
         columns=["Title", "Body", "URL", "Date"],
     ).dropna()
     results_df = results_df.reset_index(drop=True)
-    print(results_df.head())
     return results_df
 
 

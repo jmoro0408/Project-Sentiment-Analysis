@@ -6,16 +6,16 @@ Module docstring to keep pylint happy
 
 # TODO Guardian api response only includes 9 responses. Figure out how to get more.
 
+import datetime
 import os
-from re import A
 from typing import Dict, Iterable
 
-from scraping import Scraper, save_results_csv
+import pandas as pd  # type: ignore
 import requests
-from dotenv import load_dotenv
 from bs4 import BeautifulSoup as bs  # type: ignore
-from datetime import datetime
-import pandas as pd
+from dotenv import load_dotenv
+
+from scraping import Scraper, save_results_csv
 
 load_dotenv()
 API_KEY = str(os.getenv("GUARDIAN_API_KEY"))
@@ -57,8 +57,8 @@ class GuardianAPI:
         parses the response from the api query. See link for examples:
         https://open-platform.theguardian.com/explore/
         the response typically returns a ton of web page results. To keep this similar to the bbc
-        article, and generally clean, I'm making this grab only one result at a time, correspoding to the
-        "result_number" argument.
+        article, and generally clean, I'm making this grab only one result at a time,
+        corresponding to the "result_number" argument.
         This method deliberately only parses one result at a time.
         The intention here is that this method is called in a loop, parsing each result as required.
         The argument result_number should be supplied, calling out which specific result is wanted.
@@ -80,10 +80,11 @@ class GuardianArticle(Scraper):
     """
     class to handle the parsing of individial guardian articles
     """
-    body: str
-    date: datetime.date
 
-    def __init__(self, url:str):
+    body: str
+    article_date: datetime.date
+
+    def __init__(self, url: str):
         article = requests.get(url)
         self.soup = bs(article.content, "html.parser")
 
@@ -94,16 +95,16 @@ class GuardianArticle(Scraper):
         text_blocks = self.soup.findAll("div", attrs={"data-gu-name": "body"})
         text_list = []
         for element in text_blocks:
-            text_list.append((element.findAll(text = True)))
+            text_list.append((element.findAll(text=True)))
         text = " ".join(text_list[0])
         return text
 
 
-
 def main(search_term: str, api_key: str, search_pages: Iterable):
     """
+    main function #to write
     """
-    guardian_api = GuardianAPI(search_term=search_term, api_key = api_key)
+    guardian_api = GuardianAPI(search_term=search_term, api_key=api_key)
     titles = []
     bodies = []
     dates = []
@@ -115,7 +116,7 @@ def main(search_term: str, api_key: str, search_pages: Iterable):
 
         guardian_article = GuardianArticle(api_response["url"])
         guardian_article.body = guardian_article.get_body()
-        guardian_article.date = api_response["date"]
+        guardian_article.article_date = api_response["date"]
         bodies.append(guardian_article.clean_article())
         dates.append(guardian_article.clean_date())
 
@@ -126,10 +127,8 @@ def main(search_term: str, api_key: str, search_pages: Iterable):
     results_df = results_df.reset_index(drop=True)
     return results_df
 
+
 if __name__ == "__main__":
-    results = main(
-        search_term=SEARCH_TERM,
-        api_key=API_KEY,
-        search_pages=SEARCH_PAGES)
+    results = main(search_term=SEARCH_TERM, api_key=API_KEY, search_pages=SEARCH_PAGES)
     if SAVE:
         save_results_csv(results, fname=f"{SEARCH_TERM}_guardian")
