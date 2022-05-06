@@ -8,7 +8,7 @@ Module docstring to keep pylint happy
 
 import datetime
 import os
-from typing import Dict, Iterable
+from typing import Dict, Iterable, Union
 
 import pandas as pd  # type: ignore
 import requests
@@ -29,11 +29,10 @@ class GuardianAPI:
     class to handle the querying of the guardian api
     """
 
-    results: Dict
-
     def __init__(self, search_term: str, api_key: str):
         self.search_term = search_term
         self.api_key = api_key
+        self.results: Dict
 
     def build_api_query(self) -> str:
         """
@@ -81,12 +80,11 @@ class GuardianArticle(Scraper):
     class to handle the parsing of individial guardian articles
     """
 
-    body: str
-    article_date: datetime.date
-
     def __init__(self, url: str):
         article = requests.get(url)
         self.soup = bs(article.content, "html.parser")
+        self.article_date: Union[str, datetime.date]
+        self.body: str
 
     def get_body(self) -> str:
         """
@@ -97,7 +95,8 @@ class GuardianArticle(Scraper):
         for element in text_blocks:
             text_list.append((element.findAll(text=True)))
         text = " ".join(text_list[0])
-        return text
+        self.body = text
+        return self.body
 
 
 def main(search_term: str, api_key: str, search_pages: Iterable):
@@ -115,10 +114,13 @@ def main(search_term: str, api_key: str, search_pages: Iterable):
         urls.append(api_response["url"])
 
         guardian_article = GuardianArticle(api_response["url"])
-        guardian_article.body = guardian_article.get_body()
+        guardian_article.get_body()
+        guardian_article.clean_article(strings_to_remove=None)
         guardian_article.article_date = api_response["date"]
-        bodies.append(guardian_article.clean_article())
-        dates.append(guardian_article.clean_date())
+        guardian_article.clean_date()
+
+        bodies.append(guardian_article.body)
+        dates.append(guardian_article.article_date)
 
     results_df = pd.DataFrame(
         list(zip(titles, bodies, urls, dates)),
@@ -130,5 +132,6 @@ def main(search_term: str, api_key: str, search_pages: Iterable):
 
 if __name__ == "__main__":
     results = main(search_term=SEARCH_TERM, api_key=API_KEY, search_pages=SEARCH_PAGES)
+    print(results)
     if SAVE:
         save_results_csv(results, fname=f"{SEARCH_TERM}_guardian")
