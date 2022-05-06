@@ -70,19 +70,17 @@ class BBCArticle(Scraper):
     main scraping class for BBC articles
     """
 
-    body: str
-    title: str
-    article_date: Union[str, datetime.date]
-
     def __init__(self, url: str):
         article = requests.get(url)
         self.soup = bs(article.content, "html.parser")
+        self.title = None
 
     def get_date(self) -> str:
         """
         returns the date of the published article in datetime format
         """
-        return str(self.soup.time.attrs["datetime"])
+        self.article_date = str(self.soup.time.attrs["datetime"])
+        return self.article_date
 
     def get_body(self) -> str:
         """
@@ -95,7 +93,8 @@ class BBCArticle(Scraper):
                 if p.name is None:
                     text_list.append(p)
         text = " ".join(text_list)
-        return text
+        self.body = text
+        return self.body
 
     def get_title(self) -> Union[str, float]:
         """
@@ -103,9 +102,10 @@ class BBCArticle(Scraper):
         """
         title_class = "ssrcss-15xko80-StyledHeading e1fj1fc10"
         try:
-            return str(self.soup.find(class_=title_class).text)
+            self.title = str(self.soup.find(class_=title_class).text)
         except AttributeError:
-            return float("nan")  # Return nan so that it can be dropped by df.dropna()
+            self.title = float("nan")
+        return float("nan")  # Return nan so that it can be dropped by df.dropna()
 
 
 def main(search_term: str, pages: Iterable) -> pd.DataFrame:
@@ -126,17 +126,14 @@ def main(search_term: str, pages: Iterable) -> pd.DataFrame:
     dates = []
     for article_url in article_urls:
         bbc_article = BBCArticle(url=article_url)
-        bbc_article.title = str(
-            bbc_article.get_title()
-        )  # mypy complains if not wrapped in str()
-        bbc_article.body = bbc_article.get_body()
-        bbc_article.article_date = bbc_article.get_date()
-        bbc_article.article_date = bbc_article.clean_date()
-        titles.append(bbc_article.title)
-        bodies.append(
-            bbc_article.clean_article(strings_to_remove=article_strings_to_remove)
-        )
+        bbc_article.get_title()
+        bbc_article.get_body()
+        bbc_article.get_date()
+        bbc_article.clean_article(strings_to_remove=article_strings_to_remove)
+        bbc_article.clean_date()
 
+        titles.append(bbc_article.title)
+        bodies.append(bbc_article.body)
         dates.append(bbc_article.article_date)
 
     results_df = pd.DataFrame(
@@ -149,5 +146,6 @@ def main(search_term: str, pages: Iterable) -> pd.DataFrame:
 
 if __name__ == "__main__":
     results = main(search_term=SEARCH_TERM, pages=SEARCH_PAGES)
+    print(results.head())
     if SAVE:
         save_results_csv(results, fname=f"{SEARCH_TERM}_bbc")

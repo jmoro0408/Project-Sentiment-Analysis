@@ -13,10 +13,12 @@ class Scraper:
     """
     Scraper methods that can be used across multiple news scraping sites
     """
+    def __init__(self):
+        self.body = None
+        self.article_Date = None
 
-    body: str
-    soup: bs4.BeautifulSoup
-    article_date: Union[str, datetime.date]
+    """named article_date vs date to
+    avoid confusion with datetime.date or "from datetime import date"""
 
     def clean_date(self) -> datetime.date:
         """
@@ -25,7 +27,8 @@ class Scraper:
         example input: 2022-04-03T13:14:11
         """
         date_string = str(self.article_date).split("T", maxsplit=1)[0]
-        return datetime.date.fromisoformat(date_string)
+        self.article_date = datetime.date.fromisoformat(date_string)
+        return self.article_date
 
     def clean_article(self, strings_to_remove: Optional[List] = None) -> Optional[str]:
         """
