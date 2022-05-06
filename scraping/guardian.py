@@ -1,19 +1,27 @@
 """
 Module docstring to keep pylint happy
 """
+# TODO Move the creation of the results df from here and bbc into scraping.py
+# Possibly return a dict of lists from and results then build df from there?
+
+# TODO Guardian api response only includes 9 responses. Figure out how to get more.
 
 import os
 from re import A
-from typing import Dict
+from typing import Dict, Iterable
 
-from scraping import Scraper
+from scraping import Scraper, save_results_csv
 import requests
 from dotenv import load_dotenv
 from bs4 import BeautifulSoup as bs  # type: ignore
+from datetime import datetime
+import pandas as pd
 
 load_dotenv()
 API_KEY = str(os.getenv("GUARDIAN_API_KEY"))
 SEARCH_TERM = "crossrail"
+SEARCH_PAGES = [0]
+SAVE = False
 
 
 class GuardianAPI:
@@ -61,9 +69,9 @@ class GuardianAPI:
             result for result in results_list if result["type"] == "article"
         ]
         result_dict = {
-            "webTitle": article_results[result_number]["webTitle"],
-            "webUrl": article_results[result_number]["webUrl"],
-            "webPublicationDate": article_results[result_number]["webPublicationDate"],
+            "title": article_results[result_number]["webTitle"],
+            "url": article_results[result_number]["webUrl"],
+            "date": article_results[result_number]["webPublicationDate"],
         }
         return result_dict
 
@@ -73,6 +81,8 @@ class GuardianArticle(Scraper):
     class to handle the parsing of individial guardian articles
     """
     body: str
+    date: datetime.date
+
     def __init__(self, url:str):
         article = requests.get(url)
         self.soup = bs(article.content, "html.parser")
@@ -89,18 +99,37 @@ class GuardianArticle(Scraper):
         return text
 
 
-def main(search_term: str, api_key: str, result_num: int):
+
+def main(search_term: str, api_key: str, search_pages: Iterable):
     """
     """
-    guardian_api = GuardianAPI(search_term, api_key)
-    guardian_api.results = guardian_api.parse_api_response(result_num)
-    guardian_article = GuardianArticle(url = guardian_api.results["webUrl"])
-    guardian_article.body = guardian_article.get_body()
-    article_text = guardian_article.clean_article(strings_to_remove=None)
-    return article_text
+    guardian_api = GuardianAPI(search_term=search_term, api_key = api_key)
+    titles = []
+    bodies = []
+    dates = []
+    urls = []
+    for i in search_pages:
+        api_response = guardian_api.parse_api_response(result_number=i)
+        titles.append(api_response["title"])
+        urls.append(api_response["url"])
 
+        guardian_article = GuardianArticle(api_response["url"])
+        guardian_article.body = guardian_article.get_body()
+        guardian_article.date = api_response["date"]
+        bodies.append(guardian_article.clean_article())
+        dates.append(guardian_article.clean_date())
 
-
+    results_df = pd.DataFrame(
+        list(zip(titles, bodies, urls, dates)),
+        columns=["Title", "Body", "URL", "Date"],
+    ).dropna()
+    results_df = results_df.reset_index(drop=True)
+    return results_df
 
 if __name__ == "__main__":
-    print(main(search_term=SEARCH_TERM, api_key=API_KEY, result_num=0))
+    results = main(
+        search_term=SEARCH_TERM,
+        api_key=API_KEY,
+        search_pages=SEARCH_PAGES)
+    if SAVE:
+        save_results_csv(results, fname=f"{SEARCH_TERM}_guardian")
