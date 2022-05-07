@@ -1,16 +1,13 @@
 """
 Module docstring to keep pylint happy
 """
-# TODO Move the creation of the results df from here and bbc into scraping.py
-# Possibly return a dict of lists from and results then build df from there?
-
 
 import datetime
 import os
 from typing import Dict, Iterable, Union
 
-import pandas as pd  # type: ignore
 import requests
+from tqdm import tqdm #type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
 from dotenv import load_dotenv
 from scraping import Scraper, df_from_article_dict, save_results_csv #type: ignore
@@ -18,7 +15,7 @@ from scraping import Scraper, df_from_article_dict, save_results_csv #type: igno
 load_dotenv()
 API_KEY = str(os.getenv("GUARDIAN_API_KEY"))
 SEARCH_TERM = "crossrail"
-SEARCH_PAGES = [1, 2]
+SEARCH_PAGES = range(1,6)
 SAVE = False
 
 
@@ -112,11 +109,11 @@ def build_article_results_dict(
     bodies = []
     dates = []
     urls = []
-    for page in search_pages:
+    for page in tqdm(search_pages):
         guardian_api = GuardianAPI(
             search_term=search_term, api_key=api_key, search_page=page
         )
-        for result in result_nums:
+        for result in tqdm(result_nums):
             api_response = guardian_api.parse_api_response(result_number=result)
             titles.append(api_response["title"])
             urls.append(api_response["url"])
@@ -146,4 +143,6 @@ if __name__ == "__main__":
     print(results.head())
     print(f"dataframe has {len(results)} rows)")
     if SAVE:
+        print("Saving..")
         save_results_csv(results, fname=f"{SEARCH_TERM}_guardian")
+        print("Saved")
