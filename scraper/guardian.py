@@ -13,13 +13,12 @@ import pandas as pd  # type: ignore
 import requests
 from bs4 import BeautifulSoup as bs  # type: ignore
 from dotenv import load_dotenv
-
-from scraping import Scraper, save_results_csv, df_from_article_dict
+from scraping import Scraper, df_from_article_dict, save_results_csv #type: ignore
 
 load_dotenv()
 API_KEY = str(os.getenv("GUARDIAN_API_KEY"))
 SEARCH_TERM = "crossrail"
-SEARCH_PAGES = [1,2]
+SEARCH_PAGES = [1, 2]
 SAVE = False
 
 
@@ -28,12 +27,11 @@ class GuardianAPI:
     class to handle the querying of the guardian api
     """
 
-    def __init__(self, search_term: str, api_key: str, search_page:int):
+    def __init__(self, search_term: str, api_key: str, search_page: int):
         self.search_term = search_term
         self.api_key = api_key
         self.search_page = search_page
         self.results: Dict
-
 
     def build_api_query(self) -> str:
         """
@@ -94,13 +92,18 @@ class GuardianArticle(Scraper):
         text_blocks = self.soup.findAll("div", attrs={"data-gu-name": "body"})
         text_list = []
         for element in text_blocks:
-            text_list.append((element.findAll(text=True)))
+            text_list.append((element.findAll(string=True)))
         text = " ".join(text_list[0])
         self.body = text
         return self.body
 
 
-def build_article_results_dict(search_term: str, api_key: str,search_pages: Iterable,  result_nums: Iterable = range(0,9)) -> Dict:
+def build_article_results_dict(
+    search_term: str,
+    api_key: str,
+    search_pages: Iterable,
+    result_nums: Iterable = range(0, 9),
+) -> Dict:
     """
     main function #to write
     """
@@ -110,7 +113,9 @@ def build_article_results_dict(search_term: str, api_key: str,search_pages: Iter
     dates = []
     urls = []
     for page in search_pages:
-        guardian_api = GuardianAPI(search_term=search_term, api_key=api_key, search_page=page)
+        guardian_api = GuardianAPI(
+            search_term=search_term, api_key=api_key, search_page=page
+        )
         for result in result_nums:
             api_response = guardian_api.parse_api_response(result_number=result)
             titles.append(api_response["title"])
@@ -125,16 +130,18 @@ def build_article_results_dict(search_term: str, api_key: str,search_pages: Iter
             bodies.append(guardian_article.body)
             dates.append(guardian_article.article_date)
     guardian_articles_dict = {
-        "Title":titles,
-        "Body":bodies,
-        "URL":urls,
-        "Date":dates
+        "Title": titles,
+        "Body": bodies,
+        "URL": urls,
+        "Date": dates,
     }
     return guardian_articles_dict
 
 
 if __name__ == "__main__":
-    article_dict = build_article_results_dict(search_term=SEARCH_TERM, api_key=API_KEY, search_pages = SEARCH_PAGES)
+    article_dict = build_article_results_dict(
+        search_term=SEARCH_TERM, api_key=API_KEY, search_pages=SEARCH_PAGES
+    )
     results = df_from_article_dict(article_dict)
     print(results.head())
     print(f"dataframe has {len(results)} rows)")

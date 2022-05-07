@@ -3,7 +3,7 @@ Module to hold scraping functions that can be used across various news scraping 
 """
 import datetime
 from pathlib import Path
-from typing import List, Optional, Union, Dict
+from typing import Dict, List, Optional, Union
 
 import pandas as pd  # type: ignore
 
@@ -42,6 +42,7 @@ class Scraper:
                 return cleaned_text.strip()
             return self.body.strip()
         return None
+
 
 def df_from_article_dict(article_results_dict: Dict) -> pd.DataFrame:
     results_df = pd.DataFrame.from_dict(article_results_dict)
