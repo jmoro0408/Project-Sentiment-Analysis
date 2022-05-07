@@ -4,7 +4,6 @@ Module docstring to keep pylint happy
 # TODO Move the creation of the results df from here and bbc into scraping.py
 # Possibly return a dict of lists from and results then build df from there?
 
-# TODO Guardian api response only includes 9 responses. Figure out how to get more.
 
 import datetime
 import os

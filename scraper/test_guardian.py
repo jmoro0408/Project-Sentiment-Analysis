@@ -1,3 +1,4 @@
+from sys import api_version
 import unittest
 import requests
 
@@ -6,7 +7,8 @@ from scraper.guardian import API_KEY, GuardianAPI, GuardianArticle
 class TestGuardianAPI(unittest.TestCase):
     def setUp(self):
         search_term = "search with  spaces "
-        self.guardian_api = GuardianAPI(search_term=search_term, api_key=API_KEY)
+        search_page  = 1
+        self.guardian_api = GuardianAPI(search_term=search_term, api_key=API_KEY, search_page=search_page)
 
     def test_build_api_query_spaces(self):
         assert " " not in self.guardian_api.build_api_query()
