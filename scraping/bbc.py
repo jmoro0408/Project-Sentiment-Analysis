@@ -17,7 +17,8 @@ from typing import Dict, Iterable, List, Union
 import pandas as pd  # type: ignore
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
-from scraper import Scraper, df_from_article_dict, save_results_csv #type: ignore
+from scraper import (Scraper, df_from_article_dict,  # type: ignore
+                     save_results_csv)
 
 SAVE = False
 SEARCH_TERM = "HS2"

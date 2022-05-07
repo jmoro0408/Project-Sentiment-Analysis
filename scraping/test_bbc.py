@@ -1,7 +1,7 @@
 import unittest
 
-import bbc #type: ignore
-import pandas as pd #type: ignore
+import bbc  # type: ignore
+import pandas as pd  # type: ignore
 
 # TODO I dont really know how to write unit tests
 

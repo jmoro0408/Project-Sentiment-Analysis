@@ -7,10 +7,11 @@ import os
 from typing import Dict, Iterable, Union
 
 import requests
-from tqdm import tqdm #type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
 from dotenv import load_dotenv
-from scraper import Scraper, df_from_article_dict, save_results_csv #type: ignore
+from scraper import (Scraper, df_from_article_dict,  # type: ignore
+                     save_results_csv)
+from tqdm import tqdm  # type: ignore
 
 load_dotenv()
 API_KEY = str(os.getenv("GUARDIAN_API_KEY"))
