@@ -3,7 +3,7 @@ from sys import api_version
 
 import requests
 
-from scraper.guardian import API_KEY, GuardianAPI, GuardianArticle
+from scraping.guardian import API_KEY, GuardianAPI, GuardianArticle
 
 
 class TestGuardianAPI(unittest.TestCase):

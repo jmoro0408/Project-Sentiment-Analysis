@@ -12,13 +12,12 @@ Module will provide article title, text, date, and url
 
 # TODO main() is doing too much. Seperate out the BBCArticle Object construction.
 
-import datetime
 from typing import Dict, Iterable, List, Union
 
 import pandas as pd  # type: ignore
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
-from scraping import Scraper, df_from_article_dict, save_results_csv #type: ignore
+from scraper import Scraper, df_from_article_dict, save_results_csv #type: ignore
 
 SAVE = False
 SEARCH_TERM = "HS2"

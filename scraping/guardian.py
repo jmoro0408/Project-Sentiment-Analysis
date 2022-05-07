@@ -10,12 +10,12 @@ import requests
 from tqdm import tqdm #type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
 from dotenv import load_dotenv
-from scraping import Scraper, df_from_article_dict, save_results_csv #type: ignore
+from scraper import Scraper, df_from_article_dict, save_results_csv #type: ignore
 
 load_dotenv()
 API_KEY = str(os.getenv("GUARDIAN_API_KEY"))
 SEARCH_TERM = "crossrail"
-SEARCH_PAGES = range(1,6)
+SEARCH_PAGES: Iterable = [1]
 SAVE = False
 
 
