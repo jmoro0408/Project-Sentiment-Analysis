@@ -23,7 +23,7 @@ class TestBBCArticle(unittest.TestCase):
     pass
 
 class TestMain(unittest.TestCase):
-    def test_main(self):
+    def test_main_(self):
         search_term = "crossrail"
         pages = [1]
         result = bbc.main(search_term, pages)
