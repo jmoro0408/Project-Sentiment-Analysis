@@ -26,7 +26,7 @@ class TestMain(unittest.TestCase):
     def test_main_(self):
         search_term = "crossrail"
         pages = [1]
-        result = bbc.main(search_term, pages)
+        result = bbc.build_article_results_dict(search_term, pages)
         self.assertIsInstance(result, pd.DataFrame)
 
 

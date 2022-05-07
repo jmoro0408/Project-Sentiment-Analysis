@@ -13,13 +13,13 @@ Module will provide article title, text, date, and url
 # TODO main() is doing too much. Seperate out the BBCArticle Object construction.
 
 import datetime
-from typing import Iterable, List, Union
+from typing import Iterable, List, Union, Dict
 
 import pandas as pd  # type: ignore
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
 
-from scraping import Scraper, save_results_csv
+from scraping import Scraper, save_results_csv, df_from_article_dict
 
 SAVE = False
 SEARCH_TERM = "HS2"
@@ -110,7 +110,7 @@ class BBCArticle(Scraper):
         return float("nan")  # Return nan so that it can be dropped by df.dropna()
 
 
-def main(search_term: str, pages: Iterable) -> pd.DataFrame:
+def build_article_results_dict(search_term: str, pages: Iterable) -> Dict:
     """
     Run through the bbc news article pipeline.
     1. gets the search page results from the search term and num of pages
@@ -137,17 +137,19 @@ def main(search_term: str, pages: Iterable) -> pd.DataFrame:
         titles.append(bbc_article.title)
         bodies.append(bbc_article.body)
         dates.append(bbc_article.article_date)
+    bbc_articles_dict = {
+        "Title":titles,
+        "Body":bodies,
+        "URL":article_urls,
+        "Date":dates
+    }
+    return bbc_articles_dict
 
-    results_df = pd.DataFrame(
-        list(zip(titles, bodies, article_urls, dates)),
-        columns=["Title", "Body", "URL", "Date"],
-    ).dropna()
-    results_df = results_df.reset_index(drop=True)
-    return results_df
 
 
 if __name__ == "__main__":
-    results = main(search_term=SEARCH_TERM, pages=SEARCH_PAGES)
+    article_results_dict = build_article_results_dict(search_term=SEARCH_TERM, pages=SEARCH_PAGES)
+    results = df_from_article_dict(article_results_dict)
     print(results.head())
     if SAVE:
         save_results_csv(results, fname=f"{SEARCH_TERM}_bbc")
