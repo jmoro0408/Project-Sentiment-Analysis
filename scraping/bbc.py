@@ -10,18 +10,17 @@ get the actual article urls we are interested in.
 Module will provide article title, text, date, and url
 """
 
+import datetime  # type: ignore
 from typing import Dict, Iterable, List, Union
 
-import pandas as pd  # type: ignore
-from tqdm import tqdm
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
-from scraper import (Scraper, df_from_article_dict,  # type: ignore
-                     save_results_csv)
+from scraper import Scraper, df_from_article_dict, save_results_csv  # type: ignore
+from tqdm import tqdm  # type: ignore
 
-SAVE = True
+SAVE = False
 SEARCH_TERM = "HS2"
-SEARCH_PAGES = range(1,10)
+SEARCH_PAGES = range(1, 10)
 
 
 class PageOutOfRangeError(Exception):
@@ -74,6 +73,8 @@ class BBCArticle(Scraper):
         article = requests.get(url)
         self.soup = bs(article.content, "html.parser")
         self.title: Union[str, float]
+        self.article_date: Union[str, datetime.date]
+        self.body: str
 
     def get_date(self) -> str:
         """

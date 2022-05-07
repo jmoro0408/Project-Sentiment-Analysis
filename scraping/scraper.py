@@ -46,7 +46,7 @@ class Scraper:
 
 def df_from_article_dict(article_results_dict: Dict) -> pd.DataFrame:
     results_df = pd.DataFrame.from_dict(article_results_dict)
-    results_df = results_df.dropna().reset_index(drop = True)
+    results_df = results_df.dropna().reset_index(drop=True)
     return results_df
 
 
