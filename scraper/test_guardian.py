@@ -1,22 +1,32 @@
 import unittest
-import os
-from dotenv import load_dotenv
 import requests
 
-from scraper.guardian import API_KEY, GuardianAPI
+from scraper.guardian import API_KEY, GuardianAPI, GuardianArticle
 
 class TestGuardianAPI(unittest.TestCase):
-    load_dotenv()
-    API_KEY = str(os.getenv("GUARDIAN_API_KEY"))
+    def setUp(self):
+        search_term = "search with  spaces "
+        self.guardian_api = GuardianAPI(search_term=search_term, api_key=API_KEY)
 
     def test_build_api_query_spaces(self):
-        search_term = "search with  spaces "
-        guardian_api = GuardianAPI(search_term=search_term, api_key=API_KEY)
-        assert " " not in guardian_api.build_api_query()
+        assert " " not in self.guardian_api.build_api_query()
 
     def test_get_api_response(self):
-        search_term = "crossrail"
-        guardian_api = GuardianAPI(search_term=search_term, api_key=API_KEY)
-        _query = guardian_api.build_api_query()
+        _query = self.guardian_api.build_api_query()
         api_response = requests.get(_query)
         assert api_response.status_code == 200
+
+
+class TestGuardianArticle(unittest.TestCase):
+
+    def setUp(self):
+        url = "https://www.theguardian.com/uk-news/2022/may/04/crossrail-much-delayed-elizabeth-line-to-open-on-24-may"
+        self.article = GuardianArticle(url=url)
+
+    def test_body(self):
+        self.body = self.article.get_body()
+        assert len(self.body) > 0
+        self.assertIsInstance(self.body, str)
+
+if __name__ == "__main__":
+    unittest.main()
