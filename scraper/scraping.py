@@ -53,5 +53,5 @@ def save_results_csv(results_df: pd.DataFrame, fname: str):
     """
     save results df to csv
     """
-    save_dir = Path(Path(Path.cwd(), "scraping/results"), fname + ".csv")
+    save_dir = Path(Path.cwd(), "scraper", "results", fname + ".csv")
     results_df.to_csv(save_dir)
