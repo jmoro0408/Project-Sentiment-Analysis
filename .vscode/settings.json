@@ -2,7 +2,7 @@
     "python.testing.unittestArgs": [
         "-v",
         "-s",
-        "./scraper",
+        "./scraping",
         "-p",
         "test_*.py"
     ],
