@@ -4,6 +4,7 @@ Module to hold scraping functions that can be used across various news scraping 
 import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Union
+from configparser import ConfigParser
 
 import pandas as pd  # type: ignore
 
@@ -58,3 +59,11 @@ def save_results_csv(results_df: pd.DataFrame, fname: str):
     save_dir = Path(Path.cwd(), "scraping", "results", fname + ".csv")
     results_df.to_csv(save_dir)
     print("Saved")
+
+def read_search_config() -> Dict:
+    parser = ConfigParser()
+    parser.read(r"scraping/searching.ini")
+    config_dict = {"search_term": parser["searching_params"]["search_term"],
+                    "save":parser["searching_params"]["save"]}
+    return config_dict
+

@@ -9,15 +9,12 @@ from typing import Dict, Iterable, Union
 import requests
 from bs4 import BeautifulSoup as bs  # type: ignore
 from dotenv import load_dotenv
-from scraper import Scraper, df_from_article_dict, save_results_csv  # type: ignore
+from scraper import Scraper, df_from_article_dict, save_results_csv, read_search_config  # type: ignore
 from tqdm import tqdm  # type: ignore
 
 load_dotenv()
 API_KEY = str(os.getenv("GUARDIAN_API_KEY"))
-SEARCH_TERM = "crossrail"
 SEARCH_PAGES: Iterable = [1]
-SAVE = False
-
 
 class GuardianAPI:
     """
@@ -136,11 +133,12 @@ def build_article_results_dict(
 
 
 if __name__ == "__main__":
+    search_params = read_search_config()
+    SEARCH_TERM = search_params["search_term"]
+    SAVE = search_params["save"]
     article_dict = build_article_results_dict(
         search_term=SEARCH_TERM, api_key=API_KEY, search_pages=SEARCH_PAGES
     )
     results = df_from_article_dict(article_dict)
     if SAVE:
-        print(f"Saving {len(results)} rows.")
         save_results_csv(results, fname=f"{SEARCH_TERM}_guardian")
-        print("Saved")

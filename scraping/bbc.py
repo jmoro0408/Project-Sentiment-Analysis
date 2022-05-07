@@ -15,11 +15,9 @@ from typing import Dict, Iterable, List, Union
 
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
-from scraper import Scraper, df_from_article_dict, save_results_csv  # type: ignore
+from scraper import Scraper, df_from_article_dict, save_results_csv, read_search_config  # type: ignore
 from tqdm import tqdm  # type: ignore
 
-SAVE = False
-SEARCH_TERM = "HS2"
 SEARCH_PAGES = range(1, 10)
 
 
@@ -146,6 +144,9 @@ def build_article_results_dict(search_term: str, pages: Iterable) -> Dict:
 
 
 if __name__ == "__main__":
+    search_params = read_search_config()
+    SEARCH_TERM = search_params["search_term"]
+    SAVE = search_params["save"]
     article_results_dict = build_article_results_dict(
         search_term=SEARCH_TERM, pages=SEARCH_PAGES
     )
