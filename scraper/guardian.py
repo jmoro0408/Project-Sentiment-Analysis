@@ -14,7 +14,7 @@ import requests
 from bs4 import BeautifulSoup as bs  # type: ignore
 from dotenv import load_dotenv
 
-from scraping import Scraper, save_results_csv
+from scraping import Scraper, save_results_csv, df_from_article_dict
 
 load_dotenv()
 API_KEY = str(os.getenv("GUARDIAN_API_KEY"))
@@ -100,7 +100,7 @@ class GuardianArticle(Scraper):
         return self.body
 
 
-def main(search_term: str, api_key: str,search_pages: Iterable,  result_nums: Iterable = range(0,9)):
+def build_article_results_dict(search_term: str, api_key: str,search_pages: Iterable,  result_nums: Iterable = range(0,9)) -> Dict:
     """
     main function #to write
     """
@@ -124,17 +124,18 @@ def main(search_term: str, api_key: str,search_pages: Iterable,  result_nums: It
 
             bodies.append(guardian_article.body)
             dates.append(guardian_article.article_date)
-
-    results_df = pd.DataFrame(
-        list(zip(titles, bodies, urls, dates)),
-        columns=["Title", "Body", "URL", "Date"],
-    ).dropna()
-    results_df = results_df.reset_index(drop=True)
-    return results_df
+    guardian_articles_dict = {
+        "Title":titles,
+        "Body":bodies,
+        "URL":urls,
+        "Date":dates
+    }
+    return guardian_articles_dict
 
 
 if __name__ == "__main__":
-    results = main(search_term=SEARCH_TERM, api_key=API_KEY, search_pages = SEARCH_PAGES)
+    article_dict = build_article_results_dict(search_term=SEARCH_TERM, api_key=API_KEY, search_pages = SEARCH_PAGES)
+    results = df_from_article_dict(article_dict)
     print(results.head())
     print(f"dataframe has {len(results)} rows)")
     if SAVE:
