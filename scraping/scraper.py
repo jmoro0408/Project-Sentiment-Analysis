@@ -46,6 +46,7 @@ class Scraper:
 
 def df_from_article_dict(article_results_dict: Dict) -> pd.DataFrame:
     results_df = pd.DataFrame.from_dict(article_results_dict)
+    results_df = results_df.dropna().reset_index(drop = True)
     return results_df
 
 
@@ -53,5 +54,7 @@ def save_results_csv(results_df: pd.DataFrame, fname: str):
     """
     save results df to csv
     """
-    save_dir = Path(Path.cwd(), "scraper", "results", fname + ".csv")
+    print(f"Saving {len(results_df)} rows")
+    save_dir = Path(Path.cwd(), "scraping", "results", fname + ".csv")
     results_df.to_csv(save_dir)
+    print("Saved")

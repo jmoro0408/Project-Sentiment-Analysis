@@ -10,19 +10,18 @@ get the actual article urls we are interested in.
 Module will provide article title, text, date, and url
 """
 
-# TODO main() is doing too much. Seperate out the BBCArticle Object construction.
-
 from typing import Dict, Iterable, List, Union
 
 import pandas as pd  # type: ignore
+from tqdm import tqdm
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
 from scraper import (Scraper, df_from_article_dict,  # type: ignore
                      save_results_csv)
 
-SAVE = False
+SAVE = True
 SEARCH_TERM = "HS2"
-SEARCH_PAGES = [1]
+SEARCH_PAGES = range(1,10)
 
 
 class PageOutOfRangeError(Exception):
@@ -125,7 +124,7 @@ def build_article_results_dict(search_term: str, pages: Iterable) -> Dict:
     titles = []
     bodies = []
     dates = []
-    for article_url in article_urls:
+    for article_url in tqdm(article_urls):
         bbc_article = BBCArticle(url=article_url)
         bbc_article.get_title()
         bbc_article.get_body()
@@ -150,6 +149,5 @@ if __name__ == "__main__":
         search_term=SEARCH_TERM, pages=SEARCH_PAGES
     )
     results = df_from_article_dict(article_results_dict)
-    print(results.head())
     if SAVE:
         save_results_csv(results, fname=f"{SEARCH_TERM}_bbc")

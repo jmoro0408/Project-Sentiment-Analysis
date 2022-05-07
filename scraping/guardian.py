@@ -141,9 +141,7 @@ if __name__ == "__main__":
         search_term=SEARCH_TERM, api_key=API_KEY, search_pages=SEARCH_PAGES
     )
     results = df_from_article_dict(article_dict)
-    print(results.head())
-    print(f"dataframe has {len(results)} rows)")
     if SAVE:
-        print("Saving..")
+        print(f"Saving {len(results)} rows.")
         save_results_csv(results, fname=f"{SEARCH_TERM}_guardian")
         print("Saved")
