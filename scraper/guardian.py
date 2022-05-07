@@ -20,7 +20,7 @@ from scraping import Scraper, save_results_csv
 load_dotenv()
 API_KEY = str(os.getenv("GUARDIAN_API_KEY"))
 SEARCH_TERM = "crossrail"
-SEARCH_PAGES = [0]
+SEARCH_PAGES = [1,2]
 SAVE = False
 
 
@@ -29,17 +29,19 @@ class GuardianAPI:
     class to handle the querying of the guardian api
     """
 
-    def __init__(self, search_term: str, api_key: str):
+    def __init__(self, search_term: str, api_key: str, search_page:int):
         self.search_term = search_term
         self.api_key = api_key
+        self.search_page = search_page
         self.results: Dict
+
 
     def build_api_query(self) -> str:
         """
         create a string suitable for querying the guardian api
         """
         search_term = self.search_term.replace(" ", "%20")
-        return f"https://content.guardianapis.com/search?q={search_term}&api-key={self.api_key}"
+        return f"https://content.guardianapis.com/search?page={self.search_page}&q={search_term}&api-key={self.api_key}"
 
     def get_api_response(self) -> requests.models.Response:
         """
@@ -99,28 +101,30 @@ class GuardianArticle(Scraper):
         return self.body
 
 
-def main(search_term: str, api_key: str, search_pages: Iterable):
+def main(search_term: str, api_key: str,search_pages: Iterable,  result_nums: Iterable = range(0,9)):
     """
     main function #to write
     """
-    guardian_api = GuardianAPI(search_term=search_term, api_key=api_key)
+
     titles = []
     bodies = []
     dates = []
     urls = []
-    for i in search_pages:
-        api_response = guardian_api.parse_api_response(result_number=i)
-        titles.append(api_response["title"])
-        urls.append(api_response["url"])
+    for page in search_pages:
+        guardian_api = GuardianAPI(search_term=search_term, api_key=api_key, search_page=page)
+        for result in result_nums:
+            api_response = guardian_api.parse_api_response(result_number=result)
+            titles.append(api_response["title"])
+            urls.append(api_response["url"])
 
-        guardian_article = GuardianArticle(api_response["url"])
-        guardian_article.get_body()
-        guardian_article.clean_article(strings_to_remove=None)
-        guardian_article.article_date = api_response["date"]
-        guardian_article.clean_date()
+            guardian_article = GuardianArticle(api_response["url"])
+            guardian_article.get_body()
+            guardian_article.clean_article(strings_to_remove=None)
+            guardian_article.article_date = api_response["date"]
+            guardian_article.clean_date()
 
-        bodies.append(guardian_article.body)
-        dates.append(guardian_article.article_date)
+            bodies.append(guardian_article.body)
+            dates.append(guardian_article.article_date)
 
     results_df = pd.DataFrame(
         list(zip(titles, bodies, urls, dates)),
@@ -131,7 +135,8 @@ def main(search_term: str, api_key: str, search_pages: Iterable):
 
 
 if __name__ == "__main__":
-    results = main(search_term=SEARCH_TERM, api_key=API_KEY, search_pages=SEARCH_PAGES)
-    print(results)
+    results = main(search_term=SEARCH_TERM, api_key=API_KEY, search_pages = SEARCH_PAGES)
+    print(results.head())
+    print(f"dataframe has {len(results)} rows)")
     if SAVE:
         save_results_csv(results, fname=f"{SEARCH_TERM}_guardian")
