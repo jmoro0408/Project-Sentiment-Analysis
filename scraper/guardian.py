@@ -15,7 +15,7 @@ import requests
 from bs4 import BeautifulSoup as bs  # type: ignore
 from dotenv import load_dotenv
 
-from scraping import Scraper, save_results_csv
+from src import Scraper, save_results_csv
 
 load_dotenv()
 API_KEY = str(os.getenv("GUARDIAN_API_KEY"))
