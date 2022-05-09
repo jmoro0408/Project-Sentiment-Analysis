@@ -6,10 +6,9 @@ import datetime
 from typing import Dict, Iterable, Union
 
 import requests
-import yaml
 from bs4 import BeautifulSoup as bs  # type: ignore
 from scraper import (Scraper, df_from_article_dict,  # type: ignore
-                     read_search_config, save_results_csv)
+                     read_search_config, save_results_csv, read_api_key)
 from tqdm import tqdm  # type: ignore
 
 
@@ -131,10 +130,7 @@ def build_article_results_dict(
     }
     return guardian_articles_dict
 
-def read_api_key(yml_file:str) -> Dict:
-    with open(yml_file) as f:
-        config = yaml.load(f, Loader=yaml.SafeLoader)
-    return config
+
 
 if __name__ == "__main__":
     API_KEY = read_api_key("secrets.yml")["guardian_api"]
