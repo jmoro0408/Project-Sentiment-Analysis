@@ -1,17 +1,18 @@
 import unittest
-from sys import api_version
 
 import requests
 
-from scraping.guardian import API_KEY, GuardianAPI, GuardianArticle
+from scraping.guardian import GuardianAPI, GuardianArticle
+from scraper import read_api_key
 
 
 class TestGuardianAPI(unittest.TestCase):
     def setUp(self):
         search_term = "search with  spaces "
         search_page = 1
+        api_key = read_api_key("secrets.yml")["guardian_api"]
         self.guardian_api = GuardianAPI(
-            search_term=search_term, api_key=API_KEY, search_page=search_page
+            search_term=search_term, api_key=api_key, search_page=search_page
         )
 
     def test_build_api_query_spaces(self):
