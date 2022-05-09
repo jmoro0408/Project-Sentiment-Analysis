@@ -4,6 +4,8 @@ test.py
 test.ipynb
 .env
 /scraping/results/
+secrets.yaml
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
