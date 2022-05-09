@@ -1,9 +1,9 @@
 import unittest
 
 import requests
+from scraper import read_api_key  # type: ignore
 
 from scraping.guardian import GuardianAPI, GuardianArticle
-from scraper import read_api_key
 
 
 class TestGuardianAPI(unittest.TestCase):

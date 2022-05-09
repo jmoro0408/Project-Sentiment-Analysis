@@ -7,10 +7,9 @@ from typing import Dict, Iterable, Union
 
 import requests
 from bs4 import BeautifulSoup as bs  # type: ignore
-from scraper import (Scraper, df_from_article_dict,  # type: ignore
-                     read_search_config, save_results_csv, read_api_key)
+from scraper import df_from_article_dict  # type: ignore
+from scraper import Scraper, read_api_key, read_search_config, save_results_csv
 from tqdm import tqdm  # type: ignore
-
 
 SEARCH_PAGES: Iterable = [1]
 
@@ -129,7 +128,6 @@ def build_article_results_dict(
         "Date": dates,
     }
     return guardian_articles_dict
-
 
 
 if __name__ == "__main__":

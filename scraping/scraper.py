@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Union
 
 import pandas as pd  # type: ignore
-import yaml
+import yaml  # type: ignore
 
 
 class Scraper:
@@ -67,9 +67,9 @@ def read_search_config() -> Dict:
     parser.read(r"scraping/searching.ini")
 
     save_str = parser["searching_params"]["save"]
-    if save_str == 'True':
+    if save_str == "True":
         save = True
-    elif save_str == 'False':
+    elif save_str == "False":
         save = False
     else:
         raise ValueError(f"Cannot covert {save_str} to a bool")
@@ -79,7 +79,8 @@ def read_search_config() -> Dict:
     }
     return config_dict
 
-def read_api_key(yml_file:str) -> Dict:
+
+def read_api_key(yml_file: str) -> Dict:
     with open(yml_file) as f:
         config = yaml.load(f, Loader=yaml.SafeLoader)
     return config

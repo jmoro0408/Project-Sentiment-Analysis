@@ -15,8 +15,8 @@ from typing import Dict, Iterable, List, Union
 
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
-from scraper import (Scraper, df_from_article_dict,  # type: ignore
-                     read_search_config, save_results_csv, )
+from scraper import df_from_article_dict  # type: ignore
+from scraper import Scraper, read_search_config, save_results_csv
 from tqdm import tqdm  # type: ignore
 
 SEARCH_PAGES = range(1, 10)
