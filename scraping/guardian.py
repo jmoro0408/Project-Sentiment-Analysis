@@ -3,18 +3,17 @@ Module docstring to keep pylint happy
 """
 
 import datetime
-import os
 from typing import Dict, Iterable, Union
 
 import requests
+import yaml
 from bs4 import BeautifulSoup as bs  # type: ignore
-from dotenv import load_dotenv
 from scraper import (Scraper, df_from_article_dict,  # type: ignore
                      read_search_config, save_results_csv)
 from tqdm import tqdm  # type: ignore
 
 
-SEARCH_PAGES: Iterable = range(1,5)
+SEARCH_PAGES: Iterable = [1]
 
 
 class GuardianAPI:
@@ -132,10 +131,13 @@ def build_article_results_dict(
     }
     return guardian_articles_dict
 
+def read_api_key(yml_file:str) -> Dict:
+    with open(yml_file) as f:
+        config = yaml.load(f, Loader=yaml.SafeLoader)
+    return config
 
 if __name__ == "__main__":
-    load_dotenv()
-    API_KEY = str(os.getenv("GUARDIAN_API_KEY"))
+    API_KEY = read_api_key("secrets.yml")["guardian_api"]
     search_params = read_search_config()
     SEARCH_TERM = search_params["search_term"]
     SAVE = search_params["save"]
