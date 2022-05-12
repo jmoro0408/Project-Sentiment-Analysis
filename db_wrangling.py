@@ -8,6 +8,7 @@ from typing import Optional
 
 import psycopg2  # type: ignore
 from psycopg2 import Error  # type: ignore
+import pandas as pd # type: ignore
 
 
 def read_config(filename: str = "database.ini", section: str = "postgresql") -> dict:
@@ -28,11 +29,10 @@ def read_config(filename: str = "database.ini", section: str = "postgresql") -> 
             _db[param[0]] = param[1]
     else:
         raise Exception(
-            "Section {0} not found in the {1} file".format(section, filename)
+            f"Section {section} not found in the {filename} file"
         )
 
     return _db
-
 
 def connect(params: dict) -> psycopg2.extensions.connection:
     """
@@ -63,6 +63,17 @@ class DataBase:
         self._conn = _conn
         self.cursor = _conn.cursor()
 
+    def print_tables(self):
+        """
+        prints all tables from active connection
+        """
+        self.cursor.execute("""
+        SELECT table_name FROM information_schema.tables
+        WHERE table_schema = 'public'
+        """)
+        for table in self.cursor.fetchall():
+            print(table)
+
     def query(self, query: Optional[str] = None) -> None:
         """
         runs and prints a given SQL query on the provided database connection
@@ -92,11 +103,29 @@ class DataBase:
         except (Exception, Error) as error:
             print("Error while connecting to PostgreSQL", error)
 
+    def copy_from_csv(self, csv_dir: str, table: str) -> None:
+        """
+        Writing a saved csv file to database using copy_from()
+        """
+        with open(csv_dir, 'r',encoding='UTF-8') as f:
+            try:
+                self.cursor.copy_from(f, table, sep=",")
+                self._conn.commit()
+            except (Exception, psycopg2.DatabaseError) as error:
+                print(f"Error: {error}")
+                self._conn.rollback()
+                self.close()
+                return None
+            print("copy_from_file() done")
+            self.close()
+            return None
+
 
 if __name__ == "__main__":
-    QUERY = """SELECT * from news_source"""
+    QUERY = """SELECT * FROM HS2;"""
     connection_params = read_config()
-
     conn = connect(connection_params)
     db = DataBase(_conn=conn)
-    db.query(query=QUERY)
+    # db.query(query=QUERY)
+
+    db.copy_from_csv(csv_dir = r"scraping/results/crossrail_bbc.csv", table = "hs2")
