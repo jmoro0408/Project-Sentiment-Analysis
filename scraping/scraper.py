@@ -82,6 +82,6 @@ def read_config_yaml(yml_file: str) -> Dict:
     """
     returns contents of the config yml file into a dict
     """
-    with open(yml_file) as f:
+    with open(yml_file, encoding='utf-8') as f:
         config = yaml.load(f, Loader=yaml.SafeLoader)
     return config
