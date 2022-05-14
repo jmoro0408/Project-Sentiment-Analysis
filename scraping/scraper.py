@@ -63,19 +63,14 @@ def save_results_csv(results_df: pd.DataFrame, fname: str):
 
 
 def read_search_config() -> Dict:
+    """
+    returns values from "searching.ini" into a dict
+    """
     parser = ConfigParser()
     parser.read(r"scraping/searching.ini")
-
-    save_str = parser["searching_params"]["save"]
-    if save_str == "True":
-        save = True
-    elif save_str == "False":
-        save = False
-    else:
-        raise ValueError(f"Cannot covert {save_str} to a bool")
     config_dict = {
         "search_term": parser["searching_params"]["search_term"],
-        "save": save,
+        "save": parser['searching_params'].getboolean('save'),
     }
     return config_dict
 
