@@ -47,6 +47,9 @@ class Scraper:
 
 
 def df_from_article_dict(article_results_dict: Dict) -> pd.DataFrame:
+    """
+    transforms a results dict to pandas dataframe
+    """
     results_df = pd.DataFrame.from_dict(article_results_dict)
     results_df = results_df.dropna().reset_index(drop=True)
     return results_df
@@ -75,7 +78,10 @@ def read_search_config() -> Dict:
     return config_dict
 
 
-def read_api_key(yml_file: str) -> Dict:
+def read_config_yaml(yml_file: str) -> Dict:
+    """
+    returns contents of the config yml file into a dict
+    """
     with open(yml_file) as f:
         config = yaml.load(f, Loader=yaml.SafeLoader)
     return config

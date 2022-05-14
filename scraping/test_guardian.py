@@ -1,7 +1,7 @@
 import unittest
 
 import requests
-from scraper import read_api_key  # type: ignore
+from scraper import read_config_yaml  # type: ignore
 
 from scraping.guardian import GuardianAPI, GuardianArticle
 
@@ -10,7 +10,7 @@ class TestGuardianAPI(unittest.TestCase):
     def setUp(self):
         search_term = "search with  spaces "
         search_page = 1
-        api_key = read_api_key("secrets.yml")["guardian_api"]
+        api_key = read_config_yaml("secrets.yml")["guardian_api"]
         self.guardian_api = GuardianAPI(
             search_term=search_term, api_key=api_key, search_page=search_page
         )

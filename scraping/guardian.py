@@ -8,7 +8,7 @@ from typing import Dict, Iterable, Union
 import requests
 from bs4 import BeautifulSoup as bs  # type: ignore
 from scraper import df_from_article_dict  # type: ignore
-from scraper import Scraper, read_api_key, read_search_config, save_results_csv
+from scraper import Scraper, read_config_yaml, read_search_config, save_results_csv
 from tqdm import tqdm  # type: ignore
 
 SEARCH_PAGES: Iterable = [1]
@@ -131,7 +131,7 @@ def build_article_results_dict(
 
 
 if __name__ == "__main__":
-    API_KEY = read_api_key("secrets.yml")["guardian_api"]
+    API_KEY = read_config_yaml("secrets.yml")["guardian_api"]
     search_params = read_search_config()
     SEARCH_TERM = search_params["search_term"]
     SAVE = search_params["save"]
