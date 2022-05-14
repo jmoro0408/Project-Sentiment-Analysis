@@ -20,11 +20,10 @@ from scraper import Scraper, read_search_config, save_results_csv
 from tqdm import tqdm  # type: ignore
 
 SEARCH_PAGES = range(1, 10)
-
+NEWS_SOURCE_ID = 2 #news source value for postgres db
 
 class PageOutOfRangeError(Exception):
     """Raised when the the provided search range is out of range"""
-
     pass
 
 
@@ -136,11 +135,12 @@ def build_article_results_dict(search_term: str, pages: Iterable) -> Dict:
         bodies.append(bbc_article.body)
         dates.append(bbc_article.article_date)
     bbc_articles_dict = {
-        "Title": titles,
-        "Body": bodies,
-        "URL": article_urls,
-        "Date": dates,
+        "article_title": titles,
+        "article_text": bodies,
+        "source_url": article_urls,
+        "article_date": dates,
     }
+    bbc_articles_dict["news_source_id"] = NEWS_SOURCE_ID
     return bbc_articles_dict
 
 
