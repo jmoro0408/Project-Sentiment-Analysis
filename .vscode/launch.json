@@ -11,7 +11,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "python.pythonPath": "/opt/miniconda3/envs/project_sentiment/bin/python"
+            "python": "/opt/miniconda3/envs/project_sentiment/bin/python"
         }
     ]
 }
