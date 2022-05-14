@@ -5,6 +5,7 @@ test.ipynb
 .env
 /scraping/results/
 secrets.yml
+.vscode
 
 
 # Byte-compiled / optimized / DLL files
