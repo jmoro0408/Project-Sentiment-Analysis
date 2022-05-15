@@ -5,10 +5,10 @@ Main module for database functions, including connection querying, inserting etc
 from configparser import ConfigParser
 from mimetypes import init
 from typing import Optional
+import csv
 
 import psycopg2  # type: ignore
 from psycopg2 import Error  # type: ignore
-import pandas as pd # type: ignore
 
 
 def read_config(filename: str = "database.ini", section: str = "postgresql") -> dict:
@@ -28,11 +28,10 @@ def read_config(filename: str = "database.ini", section: str = "postgresql") -> 
         for param in params:
             _db[param[0]] = param[1]
     else:
-        raise Exception(
-            f"Section {section} not found in the {filename} file"
-        )
+        raise Exception(f"Section {section} not found in the {filename} file")
 
     return _db
+
 
 def connect(params: dict) -> psycopg2.extensions.connection:
     """
@@ -67,10 +66,12 @@ class DataBase:
         """
         prints all tables from active connection
         """
-        self.cursor.execute("""
+        self.cursor.execute(
+            """
         SELECT table_name FROM information_schema.tables
         WHERE table_schema = 'public'
-        """)
+        """
+        )
         for table in self.cursor.fetchall():
             print(table)
 
@@ -103,13 +104,14 @@ class DataBase:
         except (Exception, Error) as error:
             print("Error while connecting to PostgreSQL", error)
 
-    def copy_from_csv(self, csv_dir: str, table: str) -> None:
+    def copy_from_csv(self, search_term: str, news_source:str, table: str) -> None:
         """
         Writing a saved csv file to database using copy_from()
         """
-        with open(csv_dir, 'r',encoding='UTF-8') as f:
+        csv_dir = f"scraping/results/{search_term}_{news_source}.csv"
+        with open(csv_dir, "r", encoding="UTF-8") as f:
             try:
-                self.cursor.copy_from(f, table, sep=",")
+                self.cursor.copy_from(f, table, sep="|")
                 self._conn.commit()
             except (Exception, psycopg2.DatabaseError) as error:
                 print(f"Error: {error}")
@@ -127,5 +129,6 @@ if __name__ == "__main__":
     conn = connect(connection_params)
     db = DataBase(_conn=conn)
     # db.query(query=QUERY)
-
-    db.copy_from_csv(csv_dir = r"scraping/results/crossrail_bbc.csv", table = "hs2")
+    news_source_ = "guardian"
+    search_term_ = "HS2"
+    db.copy_from_csv(search_term=search_term_, news_source=news_source_, table="hs2")
