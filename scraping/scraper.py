@@ -8,6 +8,7 @@ from typing import Dict, List, Optional, Union
 
 import pandas as pd  # type: ignore
 import yaml  # type: ignore
+import numpy as np # type: ignore
 
 
 class Scraper:
@@ -52,6 +53,9 @@ def df_from_article_dict(article_results_dict: Dict) -> pd.DataFrame:
     """
     results_df = pd.DataFrame.from_dict(article_results_dict)
     results_df = results_df.dropna().reset_index(drop=True)
+    results_df["id"] = results_df.index
+    sql_db_column_order = ["id", "article_title", "article_date", "source_url", "article_text", "news_source_id"]
+    results_df = results_df.reindex(columns=sql_db_column_order)
     return results_df
 
 
@@ -61,7 +65,7 @@ def save_results_csv(results_df: pd.DataFrame, fname: str):
     """
     print(f"Saving {len(results_df)} rows")
     save_dir = Path(Path.cwd(), "scraping", "results", fname + ".csv")
-    results_df.to_csv(save_dir)
+    results_df.to_csv(save_dir, index = False, sep = "|")
     print("Saved")
 
 
