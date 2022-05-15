@@ -2,10 +2,10 @@
 Main module for database functions, including connection querying, inserting etc.
 """
 
+import csv
 from configparser import ConfigParser
 from mimetypes import init
 from typing import Optional
-import csv
 
 import psycopg2  # type: ignore
 from psycopg2 import Error  # type: ignore
@@ -104,7 +104,7 @@ class DataBase:
         except (Exception, Error) as error:
             print("Error while connecting to PostgreSQL", error)
 
-    def copy_from_csv(self, search_term: str, news_source:str, table: str) -> None:
+    def copy_from_csv(self, search_term: str, news_source: str, table: str) -> None:
         """
         Writing a saved csv file to database using copy_from()
         """

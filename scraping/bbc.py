@@ -20,10 +20,12 @@ from scraper import Scraper, read_search_config, save_results_csv
 from tqdm import tqdm  # type: ignore
 
 SEARCH_PAGES = range(1, 10)
-NEWS_SOURCE_ID = 2 #news source value for postgres db
+NEWS_SOURCE_ID = 2  # news source value for postgres db
+
 
 class PageOutOfRangeError(Exception):
     """Raised when the the provided search range is out of range"""
+
     pass
 
 
