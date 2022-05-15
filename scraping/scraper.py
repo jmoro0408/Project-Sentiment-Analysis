@@ -6,7 +6,6 @@ from configparser import ConfigParser
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
-import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
 import yaml  # type: ignore
 
