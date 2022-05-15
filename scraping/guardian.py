@@ -12,7 +12,7 @@ from scraper import (Scraper, read_config_yaml, read_search_config,
                      save_results_csv)
 from tqdm import tqdm  # type: ignore
 
-SEARCH_PAGES: Iterable = range(1, 2)
+SEARCH_PAGES: Iterable = range(1, 9)
 NEWS_SOURCE_ID = 1
 
 
