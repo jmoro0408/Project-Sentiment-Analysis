@@ -8,8 +8,7 @@ from typing import Dict, Iterable, Union
 import requests
 from bs4 import BeautifulSoup as bs  # type: ignore
 from scraper import df_from_article_dict  # type: ignore
-from scraper import (Scraper, read_config_yaml, read_search_config,
-                     save_results_csv)
+from scraper import Scraper, read_config_yaml, read_search_config, save_results_csv
 from tqdm import tqdm  # type: ignore
 
 SEARCH_PAGES: Iterable = range(1, 9)
@@ -129,7 +128,7 @@ def build_article_results_dict(
         "source_url": urls,
         "article_date": dates,
     }
-    guardian_articles_dict["news_source_id"] = NEWS_SOURCE_ID #type: ignore
+    guardian_articles_dict["news_source_id"] = NEWS_SOURCE_ID  # type: ignore
     return guardian_articles_dict
 
 
