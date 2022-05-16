@@ -1,5 +1,5 @@
-import pandas as pd  #type: ignore
-import transformers #type: ignore
+import pandas as pd  # type: ignore
+import transformers  # type: ignore
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from typing_extensions import TypeAlias
 
