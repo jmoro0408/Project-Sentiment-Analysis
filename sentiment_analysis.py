@@ -50,6 +50,15 @@ def write_csv(df:pd.DataFrame, search_term: str, news_source: str):
     return df.to_csv(csv_dir, sep = "|")
 
 def combine_sentiment_df(article_df: pd.DataFrame, sentiment_results:pd.Series) -> pd.DataFrame:
+    """Combines the sentiment analysis results with the original article df
+
+    Args:
+        article_df (pd.DataFrame): df containing the article text, title, date etc
+        sentiment_results (pd.Series): pd series containing the negative/positive results of the article sentiment
+
+    Returns:
+        pd.DataFrame: df wih sentiment results merged with article df
+    """
     temp_df = pd.DataFrame(sentiment_results.to_list(), columns=['negative', 'positive'])
     combined_df = pd.concat([article_df, temp_df], axis = 1, join = "inner")
     del temp_df
