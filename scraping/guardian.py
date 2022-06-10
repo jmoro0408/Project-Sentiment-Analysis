@@ -139,4 +139,5 @@ def main(search_term:str):
     )
     results = df_from_article_dict(article_dict)
     save_results_csv(results, fname=f"{search_term}_guardian")
+    return None
 
