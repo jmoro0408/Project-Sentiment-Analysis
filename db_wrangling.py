@@ -110,9 +110,9 @@ class DataBase:
         Writing a saved csv file to database using copy_expert
         """
         csv_dir = f"scraping/results/sentiment_analysis_results/{search_term}_{news_source}_sentiment.csv"
-        sql = "COPY %s FROM STDIN WITH CSV HEADER DELIMITER AS '|'"
+        sql = """COPY %s (article_title,article_date,source_url,article_text,news_source_id,negative,positive)
+                    FROM STDIN WITH CSV HEADER DELIMITER AS '|'"""
         with open(csv_dir, "r", encoding="UTF-8") as f:
-            self.cursor.execute("truncate " + table + ";")  #avoiding uploading duplicate data!
             self.cursor.copy_expert(sql=sql % table, file=f)
             print(f"{search_term}_{news_source} written to table: {table}")
             return self._conn.commit()
