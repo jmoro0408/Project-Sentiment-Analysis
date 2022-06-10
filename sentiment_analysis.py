@@ -7,7 +7,8 @@ sentiment analysis on article titles
 import pandas as pd  # type: ignore
 import transformers  # type: ignore
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
-from typing_extensions import TypeAlias
+from typing_extensions import TypeAlias, reveal_type
+from typing import Any
 
 
 TokenizerType: TypeAlias = (
@@ -46,7 +47,7 @@ def read_csv(search_term: str, news_source: str) -> pd.DataFrame:
     return pd.read_csv(csv_dir, sep="|")
 
 
-def write_csv(df: pd.DataFrame, search_term: str, news_source: str):
+def write_csv(df: pd.DataFrame, search_term: str, news_source: str) -> Any:
     """writes a pandas dataframe to csv
 
     Args:
@@ -76,7 +77,7 @@ def combine_sentiment_df(
     return combined_df
 
 
-def main(news_source:str, search_term:str):
+def main(news_source:str, search_term:str) -> None:
     """
     main function to call predictions
     """
@@ -95,3 +96,4 @@ def main(news_source:str, search_term:str):
     print("Saving to csv")
     write_csv(combined_df, search_term=search_term, news_source=news_source)
     print(f"Sentiment analysis of {search_term} from {news_source} saved to csv.")
+    return None
