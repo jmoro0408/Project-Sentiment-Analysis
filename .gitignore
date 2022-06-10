@@ -7,6 +7,8 @@ test.ipynb
 secrets.yml
 .vscode
 profile.json
+reset_id.sql
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
