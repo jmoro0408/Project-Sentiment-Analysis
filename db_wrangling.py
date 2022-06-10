@@ -2,10 +2,11 @@
 Main module for database functions, including connection querying, inserting etc.
 """
 
-import csv
 from configparser import ConfigParser
 from mimetypes import init
 from typing import Optional
+from scraping.scraper import read_search_config
+
 
 import psycopg2  # type: ignore
 from psycopg2 import Error  # type: ignore
@@ -104,31 +105,25 @@ class DataBase:
         except (Exception, Error) as error:
             print("Error while connecting to PostgreSQL", error)
 
-    def copy_from_csv(self, search_term: str, news_source: str, table: str) -> None:
+    def send_csv_to_psql(self, search_term: str, news_source: str, table: str) -> None:
         """
-        Writing a saved csv file to database using copy_from()
+        Writing a saved csv file to database using copy_expert
         """
-        csv_dir = f"scraping/results/{search_term}_{news_source}.csv"
+        csv_dir = f"scraping/results/sentiment_analysis_results/{search_term}_{news_source}_sentiment.csv"
+        sql = "COPY %s FROM STDIN WITH CSV HEADER DELIMITER AS '|'"
         with open(csv_dir, "r", encoding="UTF-8") as f:
-            try:
-                self.cursor.copy_from(f, table, sep="|")
-                self._conn.commit()
-            except (Exception, psycopg2.DatabaseError) as error:
-                print(f"Error: {error}")
-                self._conn.rollback()
-                self.close()
-                return None
-            print("copy_from_file() done")
-            self.close()
-            return None
-
+            self.cursor.execute("truncate " + table + ";")  #avoiding uploading duplicate data!
+            self.cursor.copy_expert(sql=sql % table, file=f)
+            print(f"{search_term}_{news_source} written to table: {table}")
+            return self._conn.commit()
 
 if __name__ == "__main__":
-    QUERY = """SELECT * FROM HS2;"""
+    # QUERY = """SELECT * FROM HS2;"""
     connection_params = read_config()
     conn = connect(connection_params)
     db = DataBase(_conn=conn)
     # db.query(query=QUERY)
-    news_source_ = "guardian"
-    search_term_ = "HS2"
-    db.copy_from_csv(search_term=search_term_, news_source=news_source_, table="hs2")
+    input_config = read_search_config()
+    SEARCH_TERM = input_config["search_term"]
+    NEWS_SOURCE = input_config["news_source"]
+    db.send_csv_to_psql(search_term=SEARCH_TERM, news_source=NEWS_SOURCE, table=SEARCH_TERM)
