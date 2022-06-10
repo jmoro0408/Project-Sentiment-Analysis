@@ -146,6 +146,7 @@ def build_article_results_dict(search_term: str, pages: Iterable) -> Dict:
     return bbc_articles_dict
 
 def main(search_term: str, ):
+    print(f"Scraping bbc site for {search_term} results")
     article_results_dict = build_article_results_dict(
     search_term=search_term, pages=SEARCH_PAGES
 )
