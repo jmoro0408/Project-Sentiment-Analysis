@@ -83,7 +83,7 @@ def read_search_config() -> Dict:
     config_dict = {
         "search_term": parser["searching_params"]["search_term"],
         "save": parser["searching_params"].getboolean("save"),
-        "news_source":parser["searching_params"]["news_source"]
+        "news_source": parser["searching_params"]["news_source"],
     }
     return config_dict
 

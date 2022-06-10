@@ -5,11 +5,11 @@ Main module for database functions, including connection querying, inserting etc
 from configparser import ConfigParser
 from mimetypes import init
 from typing import Optional
-from scraping.scraper import read_search_config
-
 
 import psycopg2  # type: ignore
 from psycopg2 import Error  # type: ignore
+
+from scraping.scraper import read_search_config
 
 
 def read_config(filename: str = "database.ini", section: str = "postgresql") -> dict:
@@ -117,6 +117,7 @@ class DataBase:
             print(f"{search_term}_{news_source} written to table: {table}")
             return self._conn.commit()
 
+
 if __name__ == "__main__":
     # QUERY = """SELECT * FROM HS2;"""
     connection_params = read_config()
@@ -126,4 +127,6 @@ if __name__ == "__main__":
     input_config = read_search_config()
     SEARCH_TERM = input_config["search_term"]
     NEWS_SOURCE = input_config["news_source"]
-    db.send_csv_to_psql(search_term=SEARCH_TERM, news_source=NEWS_SOURCE, table=SEARCH_TERM)
+    db.send_csv_to_psql(
+        search_term=SEARCH_TERM, news_source=NEWS_SOURCE, table=SEARCH_TERM
+    )
