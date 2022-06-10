@@ -15,9 +15,10 @@ from typing import Dict, Iterable, List, Union
 
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
+from tqdm import tqdm  # type: ignore
+
 from scraping.scraper import df_from_article_dict  # type: ignore
 from scraping.scraper import Scraper, save_results_csv
-from tqdm import tqdm  # type: ignore
 
 SEARCH_PAGES = range(1, 10)
 NEWS_SOURCE_ID = 2  # news source value for postgres db
@@ -145,14 +146,14 @@ def build_article_results_dict(search_term: str, pages: Iterable) -> Dict:
     bbc_articles_dict["news_source_id"] = NEWS_SOURCE_ID
     return bbc_articles_dict
 
-def main(search_term: str, ):
+
+def main(
+    search_term: str,
+):
     print(f"Scraping bbc site for {search_term} results")
     article_results_dict = build_article_results_dict(
-    search_term=search_term, pages=SEARCH_PAGES
-)
+        search_term=search_term, pages=SEARCH_PAGES
+    )
     results = df_from_article_dict(article_results_dict)
     save_results_csv(results, fname=f"{search_term}_bbc")
     return None
-
-
-

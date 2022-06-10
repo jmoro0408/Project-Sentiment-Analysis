@@ -8,6 +8,7 @@ from typing import Optional
 import psycopg2  # type: ignore
 from psycopg2 import Error  # type: ignore
 
+
 def read_config(filename: str = "database.ini", section: str = "postgresql") -> dict:
     """
     reads the database.ini configuration file for database connection and returns a

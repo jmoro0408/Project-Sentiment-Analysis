@@ -7,9 +7,10 @@ from typing import Dict, Iterable, Union
 
 import requests
 from bs4 import BeautifulSoup as bs  # type: ignore
-from scraping.scraper import df_from_article_dict  # type: ignore
-from scraping.scraper import (Scraper, read_config_yaml, save_results_csv)
 from tqdm import tqdm  # type: ignore
+
+from scraping.scraper import df_from_article_dict  # type: ignore
+from scraping.scraper import Scraper, read_config_yaml, save_results_csv
 
 SEARCH_PAGES: Iterable = range(1, 10)
 NEWS_SOURCE_ID = 1
@@ -131,7 +132,8 @@ def build_article_results_dict(
     guardian_articles_dict["news_source_id"] = NEWS_SOURCE_ID  # type: ignore
     return guardian_articles_dict
 
-def main(search_term:str):
+
+def main(search_term: str):
     API_KEY = read_config_yaml("secrets.yml")["guardian_api"]
     print(f"Scraping guardian site for {search_term} results")
     article_dict = build_article_results_dict(
@@ -140,4 +142,3 @@ def main(search_term:str):
     results = df_from_article_dict(article_dict)
     save_results_csv(results, fname=f"{search_term}_guardian")
     return None
-
