@@ -8,7 +8,7 @@ import pandas as pd  # type: ignore
 import transformers  # type: ignore
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from typing_extensions import TypeAlias
-from scraping.scraper import read_search_config
+
 
 TokenizerType: TypeAlias = (
     transformers.models.distilbert.tokenization_distilbert_fast.DistilBertTokenizerFast
@@ -76,24 +76,22 @@ def combine_sentiment_df(
     return combined_df
 
 
-def main():
+def main(news_source:str, search_term:str):
     """
     main function to call predictions
     """
-    input_config = read_search_config()
-    SEARCH_TERM = input_config["search_term"]
-    NEWS_SOURCE = input_config["news_source"]
     MODEL_NAME = "distilbert-base-uncased-finetuned-sst-2-english"
-    df = read_csv(search_term=SEARCH_TERM, news_source=NEWS_SOURCE)
+    print("Loading csv...")
+    df = read_csv(search_term=search_term, news_source=news_source)
+    print(f"Loading model: {MODEL_NAME}")
     tokenizer, model = load_model(MODEL_NAME)
+    print("Performing analysis...")
     sentiment_results = df["article_title"].apply(
         predict_sentiment, args=(model, tokenizer)
     )
     combined_df = combine_sentiment_df(
         article_df=df, sentiment_results=sentiment_results
     )
-    write_csv(combined_df, search_term=SEARCH_TERM, news_source=NEWS_SOURCE)
-
-
-if __name__ == "__main__":
-    main()
+    print("Saving to csv")
+    write_csv(combined_df, search_term=search_term, news_source=news_source)
+    print(f"Sentiment analysis of {search_term} from {news_source} saved to csv.")
