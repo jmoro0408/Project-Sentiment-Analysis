@@ -80,10 +80,11 @@ def read_search_config() -> Dict:
     returns values from "searching.ini" into a dict
     """
     parser = ConfigParser()
-    parser.read(r"scraping/searching.ini")
+    parser.read(r"input_config.ini")
     config_dict = {
         "search_term": parser["searching_params"]["search_term"],
         "save": parser["searching_params"].getboolean("save"),
+        "news_source":parser["searching_params"]["news_source"]
     }
     return config_dict
 
