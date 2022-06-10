@@ -10,11 +10,11 @@ import sentiment_analysis
 import db_wrangling as dbw
 
 def scrape_site(news_source: str, search_term: str):
-    match news_source:
-        case "bbc":
-            return bbc.main(search_term =search_term)
-        case "guardian":
-            return guardian.main(search_term =search_term)
+    #match case is better but only available in python 3.10+
+    if news_source == "bbc":
+        return bbc.main(search_term =search_term)
+    if news_source == "guardian":
+        return guardian.main(search_term =search_term)
 
 def perform_sentiment_analysis(news_source: str, search_term: str):
     return sentiment_analysis.main(news_source, search_term)
@@ -26,7 +26,6 @@ def write_to_db(news_source: str, search_term: str):
     return db.send_csv_to_psql(
         search_term=search_term, news_source=news_source, table=search_term
     )
-
 
 def main():
     input_config = read_search_config()
