@@ -15,8 +15,8 @@ from typing import Dict, Iterable, List, Union
 
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
-from scraper import df_from_article_dict  # type: ignore
-from scraper import Scraper, read_search_config, save_results_csv
+from scraping.scraper import df_from_article_dict  # type: ignore
+from scraping.scraper import Scraper, save_results_csv
 from tqdm import tqdm  # type: ignore
 
 SEARCH_PAGES = range(1, 10)
@@ -145,14 +145,12 @@ def build_article_results_dict(search_term: str, pages: Iterable) -> Dict:
     bbc_articles_dict["news_source_id"] = NEWS_SOURCE_ID
     return bbc_articles_dict
 
-
-if __name__ == "__main__":
-    search_params = read_search_config()
-    SEARCH_TERM = search_params["search_term"]
-    SAVE = search_params["save"]
+def main(search_term: str, ):
     article_results_dict = build_article_results_dict(
-        search_term=SEARCH_TERM, pages=SEARCH_PAGES
-    )
+    search_term=search_term, pages=SEARCH_PAGES
+)
     results = df_from_article_dict(article_results_dict)
-    if SAVE:
-        save_results_csv(results, fname=f"{SEARCH_TERM}_bbc")
+    save_results_csv(results, fname=f"{search_term}_bbc")
+
+
+

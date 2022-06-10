@@ -7,8 +7,8 @@ from typing import Dict, Iterable, Union
 
 import requests
 from bs4 import BeautifulSoup as bs  # type: ignore
-from scraper import df_from_article_dict  # type: ignore
-from scraper import (Scraper, read_config_yaml, read_search_config,
+from scraping.scraper import df_from_article_dict  # type: ignore
+from scraping.scraper import (Scraper, read_config_yaml, read_search_config,
                      save_results_csv)
 from tqdm import tqdm  # type: ignore
 
@@ -132,15 +132,11 @@ def build_article_results_dict(
     guardian_articles_dict["news_source_id"] = NEWS_SOURCE_ID  # type: ignore
     return guardian_articles_dict
 
-
-if __name__ == "__main__":
+def main(search_term:str):
     API_KEY = read_config_yaml("secrets.yml")["guardian_api"]
-    search_params = read_search_config()
-    SEARCH_TERM = search_params["search_term"]
-    SAVE = search_params["save"]
     article_dict = build_article_results_dict(
-        search_term=SEARCH_TERM, api_key=API_KEY, search_pages=SEARCH_PAGES
+        search_term=search_term, api_key=API_KEY, search_pages=SEARCH_PAGES
     )
     results = df_from_article_dict(article_dict)
-    if SAVE:
-        save_results_csv(results, fname=f"{SEARCH_TERM}_guardian")
+    save_results_csv(results, fname=f"{search_term}_guardian")
+
