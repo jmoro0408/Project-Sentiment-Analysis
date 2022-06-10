@@ -3,7 +3,6 @@ Main module for database functions, including connection querying, inserting etc
 """
 
 from configparser import ConfigParser
-from mimetypes import init
 from typing import Optional
 
 import psycopg2  # type: ignore
