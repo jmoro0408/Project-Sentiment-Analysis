@@ -8,6 +8,7 @@ import pandas as pd  # type: ignore
 import transformers  # type: ignore
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from typing_extensions import TypeAlias
+from scraping.scraper import read_search_config
 
 TokenizerType: TypeAlias = (
     transformers.models.distilbert.tokenization_distilbert_fast.DistilBertTokenizerFast
@@ -80,8 +81,9 @@ def main():
     """
     main function to call predictions
     """
-    SEARCH_TERM = "crossrail"
-    NEWS_SOURCE = "bbc"
+    input_config = read_search_config()
+    SEARCH_TERM = input_config["search_term"]
+    NEWS_SOURCE = input_config["news_source"]
     MODEL_NAME = "distilbert-base-uncased-finetuned-sst-2-english"
     df = read_csv(search_term=SEARCH_TERM, news_source=NEWS_SOURCE)
     tokenizer, model = load_model(MODEL_NAME)
