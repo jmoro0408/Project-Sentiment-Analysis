@@ -1,9 +1,0 @@
-name: project_sentiment
-dependencies:
-  - python=3.9
-  - numpy
-  - pandas
-  - requests
-  - psycopg2
-  - beautifulsoup4
-  - pyyaml
