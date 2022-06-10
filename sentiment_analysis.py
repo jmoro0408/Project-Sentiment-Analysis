@@ -53,9 +53,8 @@ def write_csv(df: pd.DataFrame, search_term: str, news_source: str):
         df (pd.DataFrame): pandas df to write
         search_term (str): search term corresponding to this specific df
         news_source (str): new source used to gather articles"""
-    csv_dir = f"scraping/results/{search_term}_{news_source}_sentiment.csv"
+    csv_dir = f"scraping/results/sentiment_analysis_results/{search_term}_{news_source}_sentiment.csv"
     return df.to_csv(csv_dir, sep="|")
-
 
 def combine_sentiment_df(
     article_df: pd.DataFrame, sentiment_results: pd.Series
