@@ -54,7 +54,6 @@ def df_from_article_dict(article_results_dict: Dict) -> pd.DataFrame:
     results_df = results_df.dropna().reset_index(drop=True)
     results_df["id"] = results_df.index
     sql_db_column_order = [
-        "id",
         "article_title",
         "article_date",
         "source_url",
