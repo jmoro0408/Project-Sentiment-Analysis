@@ -1,5 +1,6 @@
 """
-
+Main module for scraping, performing sentiment analysis, and recording
+results.
 """
 import db_wrangling as dbw
 import sentiment_analysis
