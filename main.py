@@ -24,9 +24,10 @@ def scrape_site(news_source: str, search_term: str) -> None:
     # match case is better but only available in python 3.10+
     if news_source == "bbc":
         bbc.main(search_term=search_term)
-    if news_source == "guardian":
+    elif news_source == "guardian":
         guardian.main(search_term=search_term)
-    print("Only bbc and guardian news sources are currently implemented.")
+    else:
+        print("Only bbc and guardian news sources are currently implemented.")
     return None
 
 
