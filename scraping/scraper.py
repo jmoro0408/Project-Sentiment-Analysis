@@ -5,6 +5,7 @@ import datetime
 from configparser import ConfigParser
 from pathlib import Path
 from typing import Dict, List, Optional, Union
+import math
 
 import pandas as pd  # type: ignore
 import yaml  # type: ignore
@@ -28,6 +29,8 @@ class Scraper:
         Time is discarded.
         example input: 2022-04-03T13:14:11
         """
+        if not isinstance(self.article_date, str) and math.isnan(self.article_date):
+            return self.article_date
         date_string = str(self.article_date).split("T", maxsplit=1)[0]
         self.article_date = datetime.date.fromisoformat(date_string)
         return self.article_date
