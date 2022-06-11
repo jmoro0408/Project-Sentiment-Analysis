@@ -12,6 +12,7 @@ Module will provide article title, text, date, and url
 
 import datetime  # type: ignore
 from typing import Dict, Iterable, List, Union
+import math
 
 import requests  # type: ignore
 from bs4 import BeautifulSoup as bs  # type: ignore
@@ -81,7 +82,10 @@ class BBCArticle(Scraper):
         """
         returns the date of the published article in datetime format
         """
-        self.article_date = str(self.soup.time.attrs["datetime"])
+        try:
+            self.article_date = str(self.soup.time.attrs["datetime"])
+        except AttributeError:
+            self.article_date = math.nan
         return self.article_date
 
     def get_body(self) -> str:
