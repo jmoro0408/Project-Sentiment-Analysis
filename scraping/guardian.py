@@ -111,18 +111,22 @@ def build_article_results_dict(
             search_term=search_term, api_key=api_key, search_page=page
         )
         for result in tqdm(result_nums):
-            api_response = guardian_api.parse_api_response(result_number=result)
-            titles.append(api_response["title"])
-            urls.append(api_response["url"])
+            try:
+                api_response = guardian_api.parse_api_response(result_number=result)
+                titles.append(api_response["title"])
+                urls.append(api_response["url"])
 
-            guardian_article = GuardianArticle(api_response["url"])
-            guardian_article.get_body()
-            guardian_article.clean_article(strings_to_remove=None)
-            guardian_article.article_date = api_response["date"]
-            guardian_article.clean_date()
+                guardian_article = GuardianArticle(api_response["url"])
+                guardian_article.get_body()
+                guardian_article.clean_article(strings_to_remove=None)
+                guardian_article.article_date = api_response["date"]
+                guardian_article.clean_date()
 
-            bodies.append(guardian_article.body)
-            dates.append(guardian_article.article_date)
+                bodies.append(guardian_article.body)
+                dates.append(guardian_article.article_date)
+            except IndexError:
+                print("List of articles available exceeded, breaking...")
+                break
     guardian_articles_dict = {
         "article_title": titles,
         "article_text": bodies,
